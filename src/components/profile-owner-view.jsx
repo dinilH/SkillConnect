@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import {
   Home,
@@ -22,633 +20,1048 @@ import {
   Send,
   ChevronLeft,
   Upload,
+  Video,
+
 } from "lucide-react"
 
 export default function ProfileOwnerView({ onBack }) {
+  // --- State Management ---
   const [posts, setPosts] = useState([
     {
       id: 1,
-      name: "Name",
+      name: "Person Name",
       time: "3d ago",
-      content: "#########################################################################",
+      content: "Just finished a great workshop on UX Accessibility. It's amazing how small changes can make such a big difference for users.",
       hasImage: true,
     },
     {
       id: 2,
-      name: "Name",
+      name: "Person Name",
       time: "5d ago",
-      content: "#########################################################################",
-      hasImage: true,
+      content: "Looking for recommendations for advanced React patterns. Drop your favorite resources below! 👇",
+      hasImage: false,
     },
   ])
 
+  const [portfolioLinks, setPortfolioLinks] = useState([
+    { id: 1, title: "GitHub", url: "github.com/alex", icon: <Github className="w-5 h-5" /> },
+    { id: 2, title: "LinkedIn", url: "linkedin.com/in/alex", icon: <Linkedin className="w-5 h-5" /> },
+    { id: 3, title: "Website", url: "alex.dev", icon: <Globe className="w-5 h-5" /> },
+  ]);
+
+  const [showPortfolioEditor, setShowPortfolioEditor] = useState(false);
+  const [newPortfolio, setNewPortfolio] = useState({ title: "", url: "" });
+  const [showAllSkills, setShowAllSkills] = useState(false);
+
+
+
+
+
   const [feedbackItems] = useState([
-    { id: 1, name: "Person1", rating: 4, comment: "Great collaborator!" },
-    { id: 2, name: "Person2", rating: 3, comment: "Good work overall" },
-    { id: 3, name: "Person3", rating: 4, comment: "Very professional" },
+    { id: 1, name: "Sarah J.", rating: 5, comment: "Great collaborator and clear communicator!" },
+    { id: 2, name: "Mike T.", rating: 3, comment: "Good technical skills, delivered on time." },
+    { id: 3, name: "Jessica R.", rating: 4, comment: "Very professional approach." },
   ])
 
-  const [newPost, setNewPost] = useState("")
-
-
+  // Modals State
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showPostModal, setShowPostModal] = useState(false)
+  const [newPostContent, setNewPostContent] = useState("")
+
   const [profileData, setProfileData] = useState({
-    coverImage: "from-blue-400 to-blue-500",
-    profileImage: "/user-profile-illustration.png",
-    name: "Person name",
+    coverImage: "from-blue-600 to-cyan-500",
+    profileImage: "/user-profile-illustration.png", // Replace with your actual image path
+    name: "Alex Anderson",
     pronouns: "(He/Him)",
-    position: "Product Manager/Student",
-    university: "University Name",
+    position: "Product Manager | UX Enthusiast",
+    university: "Stanford University",
     description:
-      "Passionate product manager with expertise in digital transformation. Creative problem solver committed to user-centric design and innovation.",
+        "Passionate product manager with expertise in digital transformation. Creative problem solver committed to user-centric design and innovation.",
     skills: [
-      { id: 1, title: "Web App development", sub: "( With React )", rating: 4 },
-      { id: 2, title: "Mobile App Developm", sub: "( With Kotlin )", rating: 3 },
-      { id: 3, title: "Programming", sub: "( With Python, JAVA )", rating: 3 },
+      { id: 1, title: "Web App Dev", sub: "(React/Next.js)", rating: 4 },
+      { id: 2, title: "Mobile Dev", sub: "(Kotlin/Swift)", rating: 3 },
+      { id: 3, title: "Backend", sub: "(Python/Django)", rating: 3 },
     ],
   })
+
+  // We keep a separate state for the form so we can cancel edits without saving
   const [editFormData, setEditFormData] = useState(profileData)
 
+  // --- Handlers ---
+
   const handlePostSubmit = () => {
-    if (newPost.trim()) {
+    if (newPostContent.trim()) {
       const post = {
         id: posts.length + 1,
-        name: "You",
-        time: "now",
-        content: newPost,
+        name: profileData.name,
+        time: "Just now",
+        content: newPostContent,
         hasImage: false,
       }
       setPosts([post, ...posts])
-      setNewPost("")
+      setNewPostContent("")
+      setShowPostModal(false)
     }
+  }
+
+  const handleOpenEditModal = () => {
+    setEditFormData(profileData) // Reset form to current data
+    setShowEditModal(true)
   }
 
   const handleSaveProfile = () => {
     setProfileData(editFormData)
     setShowEditModal(false)
   }
+  // eslint-disable-next-line no-unused-vars
+  const [coverImageFile, setCoverImageFile] = useState(null);
+
+// eslint-disable-next-line no-unused-vars
+  const [profileImageFile, setProfileImageFile] = useState(null);
+
+
+  const [showPokesPopup, setShowPokesPopup] = useState(false);
+  const [newPokesCount, setNewPokesCount] = useState(3);
+
+  // Example data: list of people who poked you
+  const [pokesData] = useState([
+    { id: 1, name: "Alice", avgRating: 4, avatar: "/avatar1.png" },
+    { id: 2, name: "Bob", avgRating: 5, avatar: "/avatar2.png" },
+    { id: 3, name: "Charlie", avgRating: 3, avatar: "/avatar3.png" },
+  ]);
+
+
+
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
-      {/* ================= HEADER ================= */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6 flex-1">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium"
-            >
-              <ChevronLeft className="w-5 h-5" />
-              Back
-            </button>
-            <div className="w-10 h-10 border-2 border-gray-400 flex items-center justify-center bg-gray-50">
-              <span className="text-xs font-bold text-gray-500">LOGO</span>
-            </div>
-            <div className="relative w-full max-w-md">
-              <span className="absolute left-3 top-2.5 text-gray-400">
-                <Search className="w-4 h-4" />
-              </span>
-              <input
-                type="text"
-                placeholder="Search (Skills / Name )"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-          </div>
-          <nav className="flex items-center gap-8">
-            <NavItem icon={<Home className="w-6 h-6" />} label="Home" />
-            <NavItem icon={<MessageCircle className="w-6 h-6" />} label="Messaging" />
-            <NavItem icon={<Bell className="w-6 h-6" />} label="Notifications" />
-            <NavItem icon={<User className="w-6 h-6" />} label="Me" />
-          </nav>
-        </div>
-      </header>
+      <div className="min-h-screen bg-[#F3F2EF] font-sans text-gray-800">
+        {/* ================= HEADER ================= */}
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40 px-4">
+          <div className="max-w-7xl mx-auto h-14 flex items-center justify-between">
+            <div className="flex items-center gap-4 flex-1">
+              <button
+                  onClick={onBack}
+                  className="flex items-center gap-1 text-gray-600 hover:text-black font-medium transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline">Back</span>
+              </button>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* ================= LEFT COLUMN ================= */}
-          <div className="flex-1 min-w-0">
-            {/* --- Profile Card --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-              {/* Cover Image */}
-              <div className={`h-40 bg-gradient-to-r ${profileData.coverImage} relative`}>
-                <button
-                  onClick={() => {
-                    setEditFormData(profileData)
-                    setShowEditModal(true)
-                  }}
-                  className="absolute bottom-3 right-3 p-2 bg-white rounded-full shadow hover:bg-gray-100"
-                >
-                  <PenTool className="w-4 h-4 text-gray-600" />
-                </button>
+              <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center font-bold text-xs tracking-tighter">
+                LOGO
               </div>
 
-              <div className="px-6 pb-6">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Left: Avatar & Bio */}
-                  <div className="flex-1">
-                    <div className="-mt-20 mb-6 inline-block relative z-10">
-                      <div className="w-32 h-32 rounded-full border-4 border-white bg-blue-500 overflow-hidden flex items-center justify-center shadow-lg">
-                        <img
+              <div className="relative w-full max-w-xs hidden md:block">
+              <span className="absolute left-3 top-2 text-gray-500">
+                <Search className="w-4 h-4" />
+              </span>
+                <input
+                    type="text"
+                    placeholder="Search"
+                    className="w-full pl-9 pr-4 py-1.5 bg-gray-100 border-none rounded text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <nav className="flex items-center gap-6 sm:gap-8">
+              <NavItem icon={<Home className="w-5 h-5" />} label="Home" active />
+              <NavItem icon={<User className="w-5 h-5" />} label="Network" />
+              <NavItem icon={<MessageCircle className="w-5 h-5" />} label="Messaging" />
+              <NavItem icon={<Bell className="w-5 h-5" />} label="Notifs" />
+              <div className="border-l pl-6 hidden sm:block">
+                <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden cursor-pointer">
+                  <img src={profileData.profileImage} alt="Me" className="w-full h-full object-cover" />
+                </div>
+              </div>
+            </nav>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+
+            {/* ================= LEFT COLUMN (Profile & Feed) ================= */}
+            <div className="flex-1 min-w-0">
+
+              {/* --- Profile Card --- */}
+              <div className="bg-white sm:rounded-xl shadow-sm border border-gray-300 overflow-hidden mb-4 relative">
+                {/* Cover Image */}
+                <div
+                    className="h-40 sm:h-48 relative group rounded-b-xl overflow-hidden"
+                    style={
+                      profileData.coverImage?.startsWith("blob:")
+                          ? { backgroundImage: `url(${profileData.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                          : { }
+                    }
+                >
+                  {/* Gradient layer only if it's a gradient */}
+                  {!profileData.coverImage?.startsWith("blob:") && (
+                      <div className={`absolute inset-0 bg-gradient-to-r ${profileData.coverImage}`} />
+                  )}
+
+                  {/* Edit Button */}
+                  <button
+                      onClick={handleOpenEditModal}
+                      className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur rounded-full shadow-sm hover:bg-white text-blue-600 transition-all opacity-0 group-hover:opacity-100 z-10"
+                  >
+                    <PenTool className="w-4 h-4" />
+                  </button>
+                </div>
+
+
+                <div className="px-4 sm:px-8 pb-8 relative">
+                  {/* Avatar */}
+                  <div className="-mt-16 mb-4 flex justify-between items-end">
+                    <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
+                      <img
                           src={profileData.profileImage || "/placeholder.svg"}
                           alt="Profile"
                           className="w-full h-full object-cover"
-                        />
-                      </div>
+                      />
                     </div>
+                    <div className="mb-2 hidden sm:block">
+                      <button
+                          onClick={handleOpenEditModal}
+                          className="flex items-center gap-2 border border-blue-600 text-blue-600 px-4 py-1.5 rounded-full hover:bg-blue-50 font-semibold text-sm transition-colors"
+                      >
+                        <PenTool className="w-3 h-3" /> Edit Profile
+                      </button>
+                    </div>
+                  </div>
 
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h1 className="text-2xl font-bold">
-                          {profileData.name} {profileData.pronouns}
-                        </h1>
-                        <span className="text-blue-500 text-xs flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                  <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left: Info */}
+                    <div className="flex-1">
+                      <div className="mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                          <h1 className="text-2xl font-bold text-gray-900">
+                            {profileData.name} <span className="text-gray-500 text-lg font-normal">{profileData.pronouns}</span>
+                          </h1>
+                          <span className="w-fit text-blue-700 bg-blue-50 border border-blue-200 text-[10px] px-2 py-0.5 rounded font-medium">
                           Verified
                         </span>
+                        </div>
+                        <p className="text-base text-gray-900 font-medium mb-1">{profileData.position}</p>
+                        <p className="text-sm text-gray-500 font-medium">{profileData.university}</p>
+                        <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                          <Globe className="w-3 h-3" /> Colombo, Western Province, Sri Lanka
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-600 font-medium">{profileData.position}</p>
-                      <p className="text-sm text-gray-500">{profileData.university}</p>
-                    </div>
 
-                    <div className="mb-6">
-                      <h3 className="text-sm font-semibold mb-1">About</h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">{profileData.description}</p>
-                    </div>
+                      <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <h3 className="text-sm font-semibold mb-2 text-gray-900">About</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">{profileData.description}</p>
+                      </div>
 
-                    <div className="space-y-3">
+                      {/* Mobile Edit Button */}
                       <button
-                        onClick={() => {
-                          setEditFormData(profileData)
-                          setShowEditModal(true)
-                        }}
-                        className="w-full flex items-center justify-center gap-2 border bg-blue-600 py-2 rounded hover:bg-blue-600 font-medium text-white transition-colors"
+                          onClick={handleOpenEditModal}
+                          className="w-full sm:hidden mb-4 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-full hover:bg-gray-50 font-semibold text-gray-600 text-sm"
                       >
-                        Edit Profile <PenTool className="w-4 h-4" />
+                        Edit Profile
                       </button>
-                      <div className="flex gap-3">
-                        <button className="flex-1 border border-gray-400 py-2 rounded hover:bg-gray-50 font-medium text-sm">
-                          Pokes
-                        </button>
-                        <button className="flex-1 border border-gray-400 py-2 rounded hover:bg-gray-50 font-medium text-sm">
-                          Achievements
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Right: Skills Box */}
-                  <div className="md:w-64">
-                    <div className="border border-gray-300 rounded p-4 h-full">
-                      <h3 className="font-bold text-sm mb-4">Skills</h3>
-                      <div className="space-y-4">
-                        {profileData.skills.map((skill) => (
-                          <SkillItem
-                            key={skill.id}
-                            icon={<FlaskConical className="w-4 h-4" />}
-                            title={skill.title}
-                            sub={skill.sub}
-                            stars={skill.rating}
-                          />
-                        ))}
+                      <div className="flex gap-3">
+                        <button
+                            onClick={() => {
+                              setShowPokesPopup(true);
+                              setNewPokesCount(0); // remove notification when popup opens
+                            }}
+                            className="relative flex-1 bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 font-semibold text-sm shadow-sm transition-colors"
+                        >
+                          Pokes
+                          {newPokesCount > 0 && (
+                              <span className="absolute top-0 right-0 -mt-1 -mr-1 w-5 h-5 text-xs flex items-center justify-center bg-red-500 text-white rounded-full">
+      {newPokesCount}
+    </span>
+                          )}
+                        </button>
+
+
+                        <button className="flex-1 border border-gray-400 py-2 rounded-full hover:bg-gray-100 text-gray-600 font-semibold text-sm transition-colors">
+                          Share Profile
+                        </button>
                       </div>
-                      <button className="mt-4 px-3 py-1 text-xs border border-gray-300 rounded text-gray-500 hover:bg-gray-50">
-                        See More
-                      </button>
                     </div>
+                    {showPokesPopup && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+
+                          {/* Backdrop */}
+                          <div
+                              className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fadeIn"
+                              onClick={() => setShowPokesPopup(false)}
+                          ></div>
+
+                          {/* Popup */}
+                          <div className="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 animate-slideUp">
+
+                            {/* Header */}
+                            <div className="flex justify-between items-center mb-4">
+                              <h3 className="text-lg font-semibold text-gray-800 border-b pb-1 w-full">
+                                Who poked you 👆
+                              </h3>
+                            </div>
+
+                            {/* Poked Users List */}
+                            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+
+                              {pokesData.length === 0 && (
+                                  <p className="text-sm text-gray-500 text-center py-4">
+                                    No one poked you yet 🙂
+                                  </p>
+                              )}
+
+                              {pokesData.map((poked) => (
+                                  <div
+                                      key={poked.id}
+                                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+                                  >
+                                    {/* Avatar + Name */}
+                                    <div className="flex items-center gap-3">
+                                      <img
+                                          src={poked.avatar}
+                                          alt={poked.name}
+                                          className="w-10 h-10 rounded-full border object-cover shadow-sm"
+                                      />
+                                      <span className="font-medium text-gray-800">
+                {poked.name}
+              </span>
+                                    </div>
+
+                                    {/* Rating Stars */}
+                                    <div className="flex gap-1">
+                                      {[1, 2, 3, 4, 5].map((i) => (
+                                          <Star
+                                              key={i}
+                                              className={`w-4 h-4 ${
+                                                  i <= poked.avgRating
+                                                      ? "fill-yellow-400 text-yellow-400"
+                                                      : "text-gray-300"
+                                              }`}
+                                          />
+                                      ))}
+                                    </div>
+                                  </div>
+                              ))}
+
+                            </div>
+
+                            {/* Close Button */}
+                            <button
+                                className="mt-5 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 font-semibold text-sm transition-all shadow-md"
+                                onClick={() => setShowPokesPopup(false)}
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                    )}
+
+
+
+
+                    {/* Right: Skills Box */}
+                    <div className="lg:w-64 flex-shrink-0">
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm h-full">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-bold text-sm">Top Skills</h3>
+                          <PenTool
+                              className="w-3 h-3 text-gray-400 cursor-pointer hover:text-blue-600"
+                              onClick={handleOpenEditModal}
+                          />
+                        </div>
+                        <div className="space-y-4">
+                          {profileData.skills
+                              .sort((a, b) => b.rating - a.rating)
+                              .slice(0, showAllSkills ? profileData.skills.length : 3)
+                              .map((skill) => (
+                                  <SkillItem
+                                      key={skill.id}
+                                      icon={<FlaskConical className="w-4 h-4" />}
+                                      title={skill.title}
+                                      sub={skill.sub}
+                                      stars={skill.rating}
+                                  />
+                              ))}
+                        </div>
+
+                        {profileData.skills.length > 3 && (
+                            <button
+                                className="w-full mt-4 py-2 text-xs font-semibold text-gray-500 border-t hover:bg-gray-50 transition-colors"
+                                onClick={() => setShowAllSkills(!showAllSkills)}
+                            >
+                              {showAllSkills
+                                  ? `Show top 3 skills`
+                                  : `Show all ${profileData.skills.length} skills`}
+                            </button>
+                        )}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* --- Create Post --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-              <div className="flex gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white">
-                  <User className="w-6 h-6" />
-                </div>
-                <div className="flex-1 relative flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Start a post"
-                    value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-full py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500 hover:bg-gray-50 transition-colors"
-                  />
+              {/* --- Start a Post (Trigger) --- */}
+              <div className="bg-white sm:rounded-xl shadow-sm border border-gray-300 p-4 mb-4">
+                <div className="flex gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                    <img src={profileData.profileImage} alt="Me" className="w-full h-full object-cover" />
+                  </div>
                   <button
-                    onClick={handlePostSubmit}
-                    disabled={!newPost.trim()}
-                    className="p-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-full transition-colors"
+                      onClick={() => setShowPostModal(true)}
+                      className="flex-1 text-left border border-gray-400 rounded-full px-5 py-3 text-sm font-medium text-gray-500 hover:bg-gray-100 transition-colors"
                   >
-                    <Send className="w-4 h-4" />
+                    Start a post, {profileData.name.split(' ')[0]}...
                   </button>
                 </div>
-              </div>
-              <div className="flex justify-between items-center px-4">
-                <div className="flex gap-6">
-                  <ActionButton icon={<ImageIcon className="w-4 h-4" />} label="Media" />
-                  <ActionButton icon={<Calendar className="w-4 h-4" />} label="Event" />
-                  <ActionButton icon={<PenTool className="w-4 h-4" />} label="Write" />
-                </div>
-              </div>
-            </div>
-
-            {/* --- Feed Posts --- */}
-            <div className="space-y-4">
-              {posts.map((post) => (
-                <PostCard key={post.id} {...post} />
-              ))}
-            </div>
-          </div>
-
-          {/* ================= RIGHT COLUMN ================= */}
-          <div className="w-full lg:w-80 space-y-6">
-            {/* --- Portfolio Links --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="font-bold text-gray-800 mb-4">Portfolio Links</h3>
-              <div className="space-y-3">
-                <PortfolioLink icon={<Github className="w-6 h-6" />} title="GITHUB" url="www............" />
-                <PortfolioLink icon={<Linkedin className="w-6 h-6" />} title="LINKEDIN" url="www............" />
-                <PortfolioLink icon={<Globe className="w-6 h-6" />} title="OWN WEB" url="www............" />
-              </div>
-              <div className="mt-4 flex justify-center border-t pt-2">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <MoreHorizontal className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* --- Feedback --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-1 bg-gray-800 rounded-full text-white">
-                    <Star className="w-3 h-3 fill-white" />
-                  </div>
-                  <h3 className="font-bold">Feedback</h3>
-                </div>
-                <div className="text-xs text-right">
-                  <p className="text-gray-500">Avg rating</p>
-                  <div className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} className="w-3 h-3 fill-gray-400 text-gray-400" />
-                    ))}
-                  </div>
+                <div className="flex justify-between px-4 pt-2">
+                  <ActionButton icon={<ImageIcon className="w-5 h-5 text-blue-500" />} label="Media" onClick={() => setShowPostModal(true)} />
+                  <ActionButton icon={<Calendar className="w-5 h-5 text-yellow-600" />} label="Event" onClick={() => setShowPostModal(true)} />
+                  <ActionButton icon={<PenTool className="w-5 h-5 text-red-500" />} label="Write article" onClick={() => setShowPostModal(true)} />
                 </div>
               </div>
 
-              {/* Feedback Items */}
-              <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
-                {feedbackItems.map((item) => (
-                  <div key={item.id} className="border-b border-gray-100 pb-3 last:border-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-gray-500 rounded-full flex-shrink-0"></div>
-                        <span className="text-xs font-bold">{item.name}</span>
-                      </div>
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${
-                              i <= item.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600">{item.comment}</p>
-                  </div>
+              {/* --- Feed Posts --- */}
+              <div className="space-y-4">
+                {posts.map((post) => (
+                    <PostCard key={post.id} {...post} currentUserImage={profileData.profileImage} />
                 ))}
               </div>
-
-              <div className="border-t pt-4">
-                <p className="text-xs text-gray-500 text-center py-2">You cannot rate your own profile</p>
-              </div>
             </div>
 
-            {/* --- Similar Profiles --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="font-bold text-sm mb-4">Other Similar Skills Profiles</h3>
-              <div className="space-y-4">
-                <SimilarProfile name="Alex Johnson" role="Senior Product Designer" showRating={true} />
-                <SimilarProfile name="Jamie Smith" role="UX Research Lead" showRating={true} />
-                <SimilarProfile name="Chris Brown" role="Head of Product Mgmt" showRating={true} />
-                <SimilarProfile name="Dana Lee" role="Chief Usability Officer" showRating={true} />
-                <SimilarProfile name="Pat Kim" role="Director of User Exp" showRating={true} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+            {/* ================= RIGHT COLUMN ================= */}
+            <div className="w-full lg:w-80 space-y-4">
 
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl my-8">
-            <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-2xl font-bold">Edit Profile</h2>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-500 hover:text-gray-700">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+              {/* --- Portfolio Links --- */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-4">
 
-            <div className="p-6 space-y-6 max-h-96 overflow-y-auto">
-              {/* Cover Image */}
-              <div>
-                <label className="block text-sm font-semibold mb-2">Cover Image</label>
-                <div className="flex gap-2">
-                  {["from-blue-400 to-blue-500", "from-purple-400 to-purple-500", "from-green-400 to-green-500"].map(
-                    (gradient) => (
-                      <button
-                        key={gradient}
-                        onClick={() => setEditFormData({ ...editFormData, coverImage: gradient })}
-                        className={`w-16 h-12 bg-gradient-to-r ${gradient} rounded border-2 ${
-                          editFormData.coverImage === gradient ? "border-gray-900" : "border-gray-300"
-                        }`}
-                      />
-                    ),
-                  )}
-                </div>
-              </div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-gray-900 text-sm">Portfolio Links</h3>
 
-              {/* Profile Picture */}
-              <div>
-                <label className="block text-sm font-semibold mb-2">Profile Picture</label>
-                <div className="flex items-center gap-4">
-                  <img
-                    src={editFormData.profileImage || "/placeholder.svg"}
-                    alt="Preview"
-                    className="w-20 h-20 rounded-full object-cover border"
-                  />
-                  <button className="flex items-center gap-2 border border-gray-300 px-4 py-2 rounded hover:bg-gray-50">
-                    <Upload className="w-4 h-4" />
-                    Change Photo
+                  <button
+                      onClick={() => setShowPortfolioEditor(true)}
+                      className="text-gray-600 hover:text-gray-900"
+                  >
+                    <PenTool className="w-3 h-3" />
                   </button>
                 </div>
-              </div>
 
-              {/* Name & Pronouns */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Name</label>
-                  <input
-                    type="text"
-                    value={editFormData.name}
-                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Pronouns</label>
-                  <input
-                    type="text"
-                    value={editFormData.pronouns}
-                    onChange={(e) => setEditFormData({ ...editFormData, pronouns: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Position & University */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-1">Position</label>
-                  <input
-                    type="text"
-                    value={editFormData.position}
-                    onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">University/College</label>
-                  <input
-                    type="text"
-                    value={editFormData.university}
-                    onChange={(e) => setEditFormData({ ...editFormData, university: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-semibold mb-1">Description</label>
-                <textarea
-                  value={editFormData.description}
-                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none h-20"
-                />
-              </div>
-
-              {/* Skills */}
-              <div>
-                <label className="block text-sm font-semibold mb-3">Skills</label>
                 <div className="space-y-3">
-                  {editFormData.skills.map((skill, idx) => (
-                    <div key={skill.id} className="border border-gray-300 rounded p-3">
-                      <div className="grid grid-cols-2 gap-2 mb-2">
-                        <input
+                  {portfolioLinks.map((item) => (
+                      <PortfolioLink
+                          key={item.id}
+                          icon={item.icon}
+                          title={item.title}
+                          url={item.url}
+                      />
+                  ))}
+                </div>
+
+              </div>
+              {showPortfolioEditor && (
+                  <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+                    <div className="bg-white w-80 p-5 rounded-xl shadow-xl space-y-4">
+
+                      <h2 classname="text-sm font-semibold text-gray-800">Add Portfolio Link</h2>
+
+                      <input
                           type="text"
-                          value={skill.title}
-                          onChange={(e) => {
-                            const newSkills = [...editFormData.skills]
-                            newSkills[idx].title = e.target.value
-                            setEditFormData({ ...editFormData, skills: newSkills })
-                          }}
-                          className="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-blue-500"
-                          placeholder="Skill name"
-                        />
-                        <input
+                          placeholder="Platform Name (e.g., GitHub)"
+                          value={newPortfolio.title}
+                          onChange={(e) => setNewPortfolio({ ...newPortfolio, title: e.target.value })}
+                          className="w-full border px-3 py-2 rounded-md text-sm"
+                      />
+
+                      <input
                           type="text"
-                          value={skill.sub}
-                          onChange={(e) => {
-                            const newSkills = [...editFormData.skills]
-                            newSkills[idx].sub = e.target.value
-                            setEditFormData({ ...editFormData, skills: newSkills })
-                          }}
-                          className="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-blue-500"
-                          placeholder="Sub-skill"
-                        />
-                      </div>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <button
-                            key={i}
+                          placeholder="URL (e.g., github.com/username)"
+                          value={newPortfolio.url}
+                          onChange={(e) => setNewPortfolio({ ...newPortfolio, url: e.target.value })}
+                          className="w-full border px-3 py-2 rounded-md text-sm"
+                      />
+
+                      <div className="flex justify-end gap-2">
+                        <button
+                            className="px-3 py-2 bg-gray-200 rounded-md text-sm"
+                            onClick={() => setShowPortfolioEditor(false)}
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                            className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm"
                             onClick={() => {
-                              const newSkills = [...editFormData.skills]
-                              newSkills[idx].rating = i
-                              setEditFormData({ ...editFormData, skills: newSkills })
+                              setPortfolioLinks([
+                                ...portfolioLinks,
+                                {
+                                  id: Date.now(),
+                                  title: newPortfolio.title,
+                                  url: newPortfolio.url,
+                                  icon: <Globe className="w-5 h-5" />, // default icon
+                                },
+                              ]);
+
+                              setNewPortfolio({ title: "", url: "" });
+                              setShowPortfolioEditor(false);
                             }}
-                            className="p-1"
-                          >
-                            <Star
-                              className={`w-4 h-4 ${
-                                i <= skill.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                              }`}
-                            />
-                          </button>
-                        ))}
+                        >
+                          Add
+                        </button>
                       </div>
+
                     </div>
+                  </div>
+              )}
+
+
+
+              {/* --- Feedback --- */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-sm">Feedback</h3>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">4.8 Avg</span>
+                </div>
+                <div className="space-y-4 mb-4">
+                  {feedbackItems.map((item) => (
+                      <div key={item.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="text-xs font-bold text-gray-800">{item.name}</span>
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <Star
+                                    key={i}
+                                    className={`w-2.5 h-2.5 ${
+                                        i <= item.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"
+                                    }`}
+                                />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600 italic">"{item.comment}"</p>
+                      </div>
                   ))}
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end gap-3 p-6 border-t">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveProfile}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium"
-              >
-                Save Changes
-              </button>
+              {/* --- Similar Profiles --- */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-4">
+                <h3 className="font-bold text-sm mb-4">People with similar skills</h3>
+                <div className="space-y-4">
+                  {/* These are read-only views with Average ratings */}
+                  <SimilarProfile name="Alex Johnson" role="Senior Product Designer" avgRating={4.8} />
+                  <SimilarProfile name="Jamie Smith" role="UX Research Lead" avgRating={4.5} />
+                  <SimilarProfile name="Chris Brown" role="Head of Product Mgmt" avgRating={4.9} />
+                  <SimilarProfile name="Dana Lee" role="Chief Usability Officer" avgRating={4.2} />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        </main>
+
+        {/* ================= MODALS ================= */}
+
+        {/* --- 1. CREATE POST POPUP --- */}
+        {showPostModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowPostModal(false)}></div>
+
+              {/* Modal Content */}
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg relative z-10 flex flex-col max-h-[90vh]">
+                <div className="flex justify-between items-center p-4 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-700">Create a post</h2>
+                  <button onClick={() => setShowPostModal(false)} className="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="p-4 flex-1 overflow-y-auto">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                      <img src={profileData.profileImage} alt="Me" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-gray-800">{profileData.name}</h4>
+                      <button className="text-xs border border-gray-400 rounded-full px-2 py-0.5 text-gray-500 flex items-center gap-1 font-medium">
+                        <Globe className="w-3 h-3" /> Anyone
+                      </button>
+                    </div>
+                  </div>
+
+                  <textarea
+                      value={newPostContent}
+                      onChange={(e) => setNewPostContent(e.target.value)}
+                      placeholder="What do you want to talk about?"
+                      className="w-full h-40 resize-none text-base outline-none text-gray-700 placeholder:text-gray-400"
+                      autoFocus
+                  />
+
+                  {/* Visual placeholder for rich text actions */}
+                  <div className="flex items-center gap-4 mt-2">
+                    <button className="text-gray-500 hover:bg-gray-100 p-2 rounded-full"><ImageIcon className="w-5 h-5"/></button>
+                    <button className="text-gray-500 hover:bg-gray-100 p-2 rounded-full"><Video className="w-5 h-5"/></button>
+                    <button className="text-gray-500 hover:bg-gray-100 p-2 rounded-full"><Calendar className="w-5 h-5"/></button>
+                    <button className="text-gray-500 hover:bg-gray-100 p-2 rounded-full"><MoreHorizontal className="w-5 h-5"/></button>
+                  </div>
+                </div>
+
+                <div className="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
+                  <button
+                      onClick={() => setShowPostModal(false)}
+                      className="px-4 py-1.5 text-gray-600 font-medium hover:bg-gray-200 rounded-full transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                      disabled={!newPostContent.trim()}
+                      onClick={handlePostSubmit}
+                      className="px-6 py-1.5 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Post
+                  </button>
+                </div>
+              </div>
+            </div>
+        )}
+
+        {/* --- 2. EDIT PROFILE POPUP --- */}
+
+        {showEditModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+              {/* Backdrop */}
+              <div
+                  className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                  onClick={() => setShowEditModal(false)}
+              />
+
+              {/* Modal */}
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl relative z-10 flex flex-col max-h-[90vh]">
+
+                {/* Header */}
+                <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+                  <h2 className="text-xl font-bold text-gray-800">Edit Profile</h2>
+                  <button
+                      onClick={() => setShowEditModal(false)}
+                      className="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* BODY */}
+                <div className="p-6 overflow-y-auto custom-scrollbar">
+
+                  {/* Hidden Upload Inputs */}
+                  <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      id="coverUpload"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setCoverImageFile(file);
+                          const url = URL.createObjectURL(file);
+                          setEditFormData({ ...editFormData, coverImage: url });
+                        }
+                      }}
+                  />
+
+                  <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      id="profileUpload"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setProfileImageFile(file);
+                          const url = URL.createObjectURL(file);
+                          setEditFormData({ ...editFormData, profileImage: url });
+                        }
+                      }}
+                  />
+
+                  {/* COVER IMAGE + GRADIENT */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Cover Image / Gradient
+                      </label>
+
+                      <button
+                          className="text-xs text-blue-600 hover:underline"
+                          onClick={() => document.getElementById("coverUpload").click()}
+                      >
+                        Upload Image
+                      </button>
+                    </div>
+
+                    {/* COVER PREVIEW (only if user uploaded image) */}
+                    {editFormData.coverImage?.startsWith("blob:") && (
+                        <img
+                            src={editFormData.coverImage}
+                            className="w-full h-32 rounded-lg object-cover border mb-3"
+                        />
+                    )}
+
+                    {/* Gradient Options */}
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                      {[
+                        "from-blue-600 to-cyan-500",
+                        "from-purple-600 to-pink-500",
+                        "from-emerald-500 to-teal-700",
+                        "from-orange-400 to-red-500",
+                      ].map((gradient) => (
+                          <button
+                              key={gradient}
+                              onClick={() =>
+                                  setEditFormData({ ...editFormData, coverImage: gradient })
+                              }
+                              className={`w-20 h-12 bg-gradient-to-r ${gradient} rounded-lg border-2 flex-shrink-0 transition-all ${
+                                  editFormData.coverImage === gradient
+                                      ? "border-black ring-2 ring-black ring-offset-1"
+                                      : "border-transparent"
+                              }`}
+                          />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* PROFILE IMAGE */}
+                  <div className="flex items-center gap-6 mb-8 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="relative">
+                      <img
+                          src={editFormData.profileImage || "/placeholder.svg"}
+                          alt="Profile Preview"
+                          className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm"
+                      />
+
+                      <div className="absolute bottom-0 right-0 bg-blue-600 p-1.5 rounded-full text-white border-2 border-white cursor-pointer"
+                           onClick={() => document.getElementById("profileUpload").click()}
+                      >
+                        <Upload className="w-3 h-3" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Profile Photo</h3>
+                      <p className="text-xs text-gray-500 mb-2">Recommended: 400×400px</p>
+
+                      <button
+                          className="text-xs font-semibold text-blue-600 hover:underline"
+                          onClick={() => document.getElementById("profileUpload").click()}
+                      >
+                        Change Photo
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* PERSONAL INFO */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Full Name</label>
+                      <input
+                          type="text"
+                          value={editFormData.name}
+                          onChange={(e) =>
+                              setEditFormData({ ...editFormData, name: e.target.value })
+                          }
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Pronouns</label>
+                      <input
+                          type="text"
+                          value={editFormData.pronouns}
+                          onChange={(e) =>
+                              setEditFormData({ ...editFormData, pronouns: e.target.value })
+                          }
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Headline</label>
+                      <input
+                          type="text"
+                          value={editFormData.position}
+                          onChange={(e) =>
+                              setEditFormData({ ...editFormData, position: e.target.value })
+                          }
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-1">University</label>
+                      <input
+                          type="text"
+                          value={editFormData.university}
+                          onChange={(e) =>
+                              setEditFormData({ ...editFormData, university: e.target.value })
+                          }
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* DESCRIPTION */}
+                  <div className="mb-8">
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">About</label>
+                    <textarea
+                        value={editFormData.description}
+                        onChange={(e) =>
+                            setEditFormData({ ...editFormData, description: e.target.value })
+                        }
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm resize-none h-24"
+                    />
+                  </div>
+
+                  {/* SKILLS */}
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                    <label className="block text-sm font-bold text-blue-900 mb-3">Highlighted Skills</label>
+
+                    <div className="space-y-3">
+                      {editFormData.skills.map((skill, idx) => (
+                          <div
+                              key={skill.id}
+                              className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col sm:flex-row gap-3 items-start sm:items-center"
+                          >
+                            <div className="flex-1 w-full grid grid-cols-2 gap-2">
+                              <input
+                                  type="text"
+                                  value={skill.title}
+                                  onChange={(e) => {
+                                    const newSkills = [...editFormData.skills];
+                                    newSkills[idx].title = e.target.value;
+                                    setEditFormData({ ...editFormData, skills: newSkills });
+                                  }}
+                                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs font-semibold"
+                                  placeholder="Skill"
+                              />
+                              <input
+                                  type="text"
+                                  value={skill.sub}
+                                  onChange={(e) => {
+                                    const newSkills = [...editFormData.skills];
+                                    newSkills[idx].sub = e.target.value;
+                                    setEditFormData({ ...editFormData, skills: newSkills });
+                                  }}
+                                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-500"
+                                  placeholder="Detail"
+                              />
+                            </div>
+
+                            {/* Rating stars */}
+                            <div className="flex gap-1 ml-auto">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                  <button
+                                      key={i}
+                                      onClick={() => {
+                                        const newSkills = [...editFormData.skills];
+                                        newSkills[idx].rating = i;
+                                        setEditFormData({ ...editFormData, skills: newSkills });
+                                      }}
+                                      className="p-1 hover:scale-110 transition-transform"
+                                  >
+                                    <Star
+                                        className={`w-4 h-4 ${
+                                            i <= skill.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                                        }`}
+                                    />
+                                  </button>
+                              ))}
+                            </div>
+                          </div>
+                      ))}
+                    </div>
+
+                    {/* Add Skill Button */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setEditFormData({
+                              ...editFormData,
+                              skills: [
+                                ...editFormData.skills,
+                                { id: Date.now(), title: "", sub: "", rating: 0 },
+                              ],
+                            })
+                        }
+                        className="mt-3 px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                    >
+                      + Add Skill
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* FOOTER */}
+                <div className="flex justify-between items-center px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                  <button className="text-sm text-red-500 font-semibold hover:underline">
+                    Delete Account
+                  </button>
+
+                  <div className="flex gap-3">
+                    <button
+                        onClick={() => setShowEditModal(false)}
+                        className="px-5 py-2 border border-gray-300 rounded-full hover:bg-gray-200 text-gray-700 font-medium"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                        onClick={handleSaveProfile}
+                        className="px-5 py-2 bg-blue-600 text-white rounded-full font-medium shadow-md hover:bg-blue-700 hover:shadow-lg"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        )}
+      </div>
   )
 }
 
-// Helper Components
-function NavItem({ icon, label }) {
+// --- Helper Components ---
+
+function NavItem({ icon, label, active }) {
   return (
-    <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 group">
-      <div className="group-hover:scale-110 transition-transform">{icon}</div>
-      <span className="text-[10px] uppercase font-medium tracking-wide">{label}</span>
-    </button>
+      <button className={`flex flex-col items-center gap-1 group relative h-full justify-center w-16 ${active ? 'border-b-2 border-black' : ''}`}>
+        <div className={`transition-transform duration-200 group-hover:-translate-y-1 ${active ? 'text-black' : 'text-gray-500 group-hover:text-gray-900'}`}>
+          {icon}
+        </div>
+        <span className={`text-[10px] sm:text-xs ${active ? 'text-black font-semibold' : 'text-gray-500 group-hover:text-gray-900'}`}>
+        {label}
+      </span>
+      </button>
   )
 }
 
 function SkillItem({ icon, title, sub, stars }) {
   return (
-    <div className="flex flex-col">
-      <div className="flex items-start gap-2 mb-1">
-        <div className="p-1 border border-gray-300 rounded">{icon}</div>
-        <div>
-          <p className="text-xs font-bold leading-tight">{title}</p>
-          <p className="text-[10px] text-gray-500">{sub}</p>
-        </div>
-      </div>
-      <div className="flex gap-0.5 pl-8">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className={`p-0.5 border border-gray-400 rounded-sm ${i <= stars ? "bg-gray-600" : "bg-transparent"}`}
-          >
-            <Star className={`w-2 h-2 ${i <= stars ? "fill-white text-white" : "text-gray-300"}`} />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function ActionButton({ icon, label }) {
-  return (
-    <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium">
-      {icon}
-      <span>{label}</span>
-    </button>
-  )
-}
-
-function PostCard({ name, time, content, hasImage }) {
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white">
-            <User className="w-5 h-5" />
-          </div>
+      <div className="flex items-center justify-between group cursor-default">
+        <div className="flex items-start gap-3">
+          <div className="p-1.5 bg-gray-100 rounded text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">{icon}</div>
           <div>
-            <h4 className="font-bold text-sm">{name}</h4>
-            <p className="text-xs text-gray-500">{time}</p>
+            <p className="text-sm font-bold leading-tight text-gray-800">{title}</p>
+            <p className="text-[11px] text-gray-500">{sub}</p>
           </div>
         </div>
-        <div className="flex gap-2 text-gray-400">
-          <MoreHorizontal className="w-5 h-5 cursor-pointer" />
-          <X className="w-5 h-5 cursor-pointer" />
+        <div className="flex gap-0.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                  key={i}
+                  className={`p-0.5 rounded-sm`}
+              >
+                <Star className={`w-3 h-3 ${i <= stars ? "fill-gray-700 text-gray-700" : "text-gray-200"}`} />
+              </div>
+          ))}
         </div>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{content}</p>
-      {hasImage && <div className="h-48 bg-gray-200 rounded-md mb-4"></div>}
-      <div className="flex justify-between border-t border-gray-100 pt-3">
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <ThumbsUp className="w-4 h-4" /> Like
-        </button>
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <MessageCircle className="w-4 h-4" /> Comment
-        </button>
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <Share2 className="w-4 h-4" /> Share
-        </button>
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <Send className="w-4 h-4" /> Send
-        </button>
+  )
+}
+
+function ActionButton({ icon, label, onClick }) {
+  return (
+      <button
+          onClick={onClick}
+          className="flex items-center gap-2 text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+      >
+        {icon}
+        <span className="hidden sm:inline">{label}</span>
+      </button>
+  )
+}
+
+function PostCard({ name, time, content, hasImage, currentUserImage }) {
+  return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-0 overflow-hidden">
+        <div className="p-4 pb-2">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-800 overflow-hidden">
+                <img src={currentUserImage || "/placeholder.svg"} alt="" className="w-full h-full object-cover"/>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-gray-900 hover:text-blue-600 cursor-pointer">{name}</h4>
+                <p className="text-xs text-gray-500">{time} • <Globe className="w-3 h-3 inline"/> </p>
+              </div>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
+          </div>
+          <p className="text-sm text-gray-800 mb-2 whitespace-pre-line leading-relaxed">{content}</p>
+        </div>
+
+        {hasImage && (
+            <div className="w-full h-64 bg-gray-200 mb-2">
+              <img src="/placeholder.svg" alt="Post content" className="w-full h-full object-cover" />
+            </div>
+        )}
+
+        <div className="px-4 py-2 border-t border-gray-100">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+            <div className="flex items-center gap-1"><ThumbsUp className="w-3 h-3 bg-blue-500 text-white rounded-full p-0.5"/> 128</div>
+            <div>5 comments • 2 shares</div>
+          </div>
+          <div className="flex justify-between border-t border-gray-100 pt-2">
+            <PostAction icon={<ThumbsUp className="w-4 h-4" />} label="Like" />
+            <PostAction icon={<MessageCircle className="w-4 h-4" />} label="Comment" />
+            <PostAction icon={<Share2 className="w-4 h-4" />} label="Repost" />
+            <PostAction icon={<Send className="w-4 h-4" />} label="Send" />
+          </div>
+        </div>
       </div>
-    </div>
+  )
+}
+function PostAction({ icon, label }) {
+  return (
+      <button className="flex items-center gap-1.5 px-3 py-2 rounded text-gray-600 hover:bg-gray-100 font-medium text-sm transition-colors flex-1 justify-center">
+        {icon}
+        <span className="hidden sm:inline">{label}</span>
+      </button>
   )
 }
 
 function PortfolioLink({ icon, title, url }) {
   return (
-    <div className="flex items-center gap-3 p-3 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
-      <div className="text-gray-700">{icon}</div>
-      <div className="flex-1 overflow-hidden">
-        <p className="text-xs font-bold uppercase">{title}</p>
-        <div className="flex items-center gap-1 text-gray-500">
-          <span className="text-xs">🔗</span>
-          <p className="text-[10px] truncate">{url}</p>
+      <div className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md cursor-pointer transition-all bg-gray-50">
+        <div className="text-gray-700 bg-white p-2 rounded shadow-sm">{icon}</div>
+        <div className="flex-1 overflow-hidden">
+          <p className="text-xs font-bold uppercase text-gray-800 tracking-wide">{title}</p>
+          <p className="text-xs text-blue-600 truncate">{url}</p>
         </div>
+        <ChevronLeft className="w-4 h-4 text-gray-400 rotate-180" />
       </div>
-    </div>
   )
 }
-
-function SimilarProfile({ name, role, showRating }) {
-  const [rating, setRating] = useState(0)
-  const [hoverRating, setHoverRating] = useState(0)
-
+function SimilarProfile({ name, role, avgRating }) {
   return (
-    <div className="flex flex-col gap-2 border-b border-gray-100 pb-3 last:border-0">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3 flex-1">
-          <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0"></div>
-          <div className="min-w-0">
-            <p className="text-xs font-bold">{name}</p>
-            <p className="text-[10px] text-gray-500 truncate">{role}</p>
+      <div className="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+        <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start">
+            <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+            {/* Static Average Rating Display */}
+            <div className="flex items-center gap-1 bg-yellow-50 px-1.5 py-0.5 rounded border border-yellow-100">
+              <Star className="w-2.5 h-2.5 fill-orange-400 text-orange-400" />
+              <span className="text-[10px] font-bold text-orange-600">{avgRating}</span>
+            </div>
           </div>
+          <p className="text-xs text-gray-500 truncate">{role}</p>
+          <button className="mt-1 text-xs font-semibold text-gray-500 border border-gray-400 rounded-full px-3 py-0.5 hover:border-black hover:text-black transition-colors">
+            View Profile
+          </button>
         </div>
-        {showRating && (
-          <div className="flex gap-0.5 ml-2">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <button
-                key={i}
-                onMouseEnter={() => setHoverRating(i)}
-                onMouseLeave={() => setHoverRating(0)}
-                onClick={() => setRating(i)}
-                className="p-0.5"
-              >
-                <Star
-                  className={`w-3 h-3 transition-colors ${
-                    i <= (hoverRating || rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                  }`}
-                />
-              </button>
-            ))}
-          </div>
-        )}
       </div>
-      <button className="w-full text-center border border-gray-400 rounded py-1 text-[10px] font-medium hover:bg-gray-50">
-        View Profile
-      </button>
-    </div>
   )
 }

@@ -15,17 +15,23 @@ import {
   ThumbsUp,
   Share2,
   Send,
-  Handshake,
   ChevronLeft,
+  CheckCircle,
+  UserPlus,
+  Mail
 } from "lucide-react"
 
 export default function ProfileViewerView({ onBack }) {
+  // --- State ---
+  const [isConnected, setIsConnected] = useState(false)
+
   const [feedbackItems, setFeedbackItems] = useState([
-    { id: 1, name: "Person1", rating: 4, comment: "Great collaborator!" },
-    { id: 2, name: "Person2", rating: 3, comment: "Good work overall" },
-    { id: 3, name: "Person3", rating: 4, comment: "Very professional" },
+    { id: 1, name: "Sarah J.", rating: 5, comment: "An absolute pleasure to work with!" },
+    { id: 2, name: "Mike T.", rating: 4, comment: "Great technical skills and communication." },
+    { id: 3, name: "Jessica R.", rating: 4, comment: "Delivered the project on time." },
   ])
 
+  // State for the NEW feedback being written by the viewer
   const [newFeedback, setNewFeedback] = useState({ rating: 0, comment: "" })
   const [hoverRating, setHoverRating] = useState(0)
 
@@ -33,366 +39,397 @@ export default function ProfileViewerView({ onBack }) {
     if (newFeedback.rating > 0 && newFeedback.comment.trim()) {
       const feedback = {
         id: feedbackItems.length + 1,
-        name: "Visitor Name",
+        name: "You", // In a real app, this would be the viewer's name
         rating: newFeedback.rating,
         comment: newFeedback.comment,
       }
-      setFeedbackItems([...feedbackItems, feedback])
+      setFeedbackItems([feedback, ...feedbackItems])
       setNewFeedback({ rating: 0, comment: "" })
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
-      {/* ================= HEADER ================= */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6 flex-1">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium"
-            >
-              <ChevronLeft className="w-5 h-5" />
-              Back
-            </button>
-            <div className="w-10 h-10 border-2 border-gray-400 flex items-center justify-center bg-gray-50">
-              <span className="text-xs font-bold text-gray-500">LOGO</span>
-            </div>
-            <div className="relative w-full max-w-md">
-              <span className="absolute left-3 top-2.5 text-gray-400">
+      <div className="min-h-screen bg-[#F3F2EF] font-sans text-gray-800">
+        {/* ================= HEADER ================= */}
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40 px-4">
+          <div className="max-w-7xl mx-auto h-14 flex items-center justify-between">
+            <div className="flex items-center gap-4 flex-1">
+              <button
+                  onClick={onBack}
+                  className="flex items-center gap-1 text-gray-600 hover:text-black font-medium transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                <span className="hidden sm:inline">Back</span>
+              </button>
+
+              <div className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center font-bold text-xs tracking-tighter">
+                LOGO
+              </div>
+
+              <div className="relative w-full max-w-xs hidden md:block">
+              <span className="absolute left-3 top-2 text-gray-500">
                 <Search className="w-4 h-4" />
               </span>
-              <input
-                type="text"
-                placeholder="Search (Skills / Name )"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:border-blue-500"
-              />
+                <input
+                    type="text"
+                    placeholder="Search"
+                    className="w-full pl-9 pr-4 py-1.5 bg-gray-100 border-none rounded text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
             </div>
+
+            <nav className="flex items-center gap-6 sm:gap-8">
+              <NavItem icon={<Home className="w-5 h-5" />} label="Home" />
+              <NavItem icon={<User className="w-5 h-5" />} label="Network" />
+              <NavItem icon={<MessageCircle className="w-5 h-5" />} label="Messaging" />
+              <NavItem icon={<Bell className="w-5 h-5" />} label="Notifs" />
+              <div className="border-l pl-6 hidden sm:block">
+                {/* This represents the viewer (ME), not the profile being viewed */}
+                <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white text-xs">
+                  ME
+                </div>
+              </div>
+            </nav>
           </div>
-          <nav className="flex items-center gap-8">
-            <NavItem icon={<Home className="w-6 h-6" />} label="Home" />
-            <NavItem icon={<MessageCircle className="w-6 h-6" />} label="Messaging" />
-            <NavItem icon={<Bell className="w-6 h-6" />} label="Notifications" />
-            <NavItem icon={<User className="w-6 h-6" />} label="Me" />
-          </nav>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* ================= LEFT COLUMN ================= */}
-          <div className="flex-1 min-w-0">
-            {/* --- Profile Card --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-              {/* Cover Image */}
-              <div className="h-40 bg-gradient-to-r from-slate-400 to-slate-500 relative"></div>
+        <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6">
+          <div className="flex flex-col lg:flex-row gap-6">
 
-              <div className="px-6 pb-6">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Left: Avatar & Bio */}
-                  <div className="flex-1">
-                    <div className="-mt-20 mb-6 inline-block relative z-10">
-                      <div className="w-32 h-32 rounded-full border-4 border-white bg-blue-500 overflow-hidden flex items-center justify-center shadow-lg">
-                        <img
+            {/* ================= LEFT COLUMN ================= */}
+            <div className="flex-1 min-w-0">
+              {/* --- Profile Card --- */}
+              <div className="bg-white sm:rounded-xl shadow-sm border border-gray-300 overflow-hidden mb-4 relative">
+                {/* Cover Image */}
+                <div className="h-40 sm:h-48 bg-gradient-to-r from-slate-500 to-slate-700 relative"></div>
+
+                <div className="px-4 sm:px-8 pb-8 relative">
+                  {/* Avatar */}
+                  <div className="-mt-16 mb-4 inline-block relative z-10">
+                    <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
+                      <img
                           src="/user-profile-illustration.png"
                           alt="Profile"
                           className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h1 className="text-2xl font-bold">Person name (He/Him)</h1>
-                        <span className="text-blue-500 text-xs flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                          Verified
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">Product Manager/Student...</p>
-                      <p className="text-sm text-gray-500">University Name</p>
-                    </div>
-
-                    <div className="mb-6">
-                      <h3 className="text-sm font-semibold mb-1">About</h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        Passionate product manager with expertise in digital transformation. Creative problem solver
-                        committed to user-centric design and innovation.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <button className="w-full flex items-center justify-center gap-2 border border-gray-400 py-2 rounded hover:bg-gray-50 font-medium text-sm transition-colors">
-                        Projects
-                      </button>
-                      <div className="flex gap-3">
-                        <button className="flex-1 border border-gray-400 py-2 rounded hover:bg-gray-50 font-medium text-sm">
-                          Poke for Help
-                        </button>
-
-                        <button className="flex-1 border w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-medium text-sm transition-colors">
-                          Send Message <Send className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Right: Skills Box */}
-                  <div className="md:w-64">
-                    <div className="border border-gray-300 rounded p-4 h-full">
-                      <h3 className="font-bold text-sm mb-4">Skills</h3>
-                      <div className="space-y-4">
-                        <SkillItem
-                          icon={<FlaskConical className="w-4 h-4" />}
-                          title="Web App development"
-                          sub="( With React )"
-                          stars={4}
-                        />
-                        <SkillItem
-                          icon={<FlaskConical className="w-4 h-4" />}
-                          title="Mobile App Developm"
-                          sub="( With Kotlin )"
-                          stars={3}
-                        />
-                        <SkillItem
-                          icon={<FlaskConical className="w-4 h-4" />}
-                          title="Programming"
-                          sub="( With Python, JAVA )"
-                          stars={3}
-                        />
-                      </div>
-                      <button className="mt-4 px-3 py-1 text-xs border border-gray-300 rounded text-gray-500 hover:bg-gray-50">
-                        See More
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* --- Posts Feed --- */}
-            <div className="space-y-4">
-              <PostCard
-                name="Name"
-                time="3d ago"
-                content="###################################################################"
-                hasImage={true}
-              />
-              <PostCard
-                name="Name"
-                time="5d ago"
-                content="###################################################################"
-                hasImage={true}
-              />
-            </div>
-          </div>
-
-          {/* ================= RIGHT COLUMN ================= */}
-          <div className="w-full lg:w-80 space-y-6">
-            {/* --- Portfolio Links --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="font-bold text-gray-800 mb-4">Portfolio Links</h3>
-              <div className="space-y-3">
-                <PortfolioLink icon={<Github className="w-6 h-6" />} title="GITHUB" url="www............" />
-                <PortfolioLink icon={<Linkedin className="w-6 h-6" />} title="LINKEDIN" url="www............" />
-                <PortfolioLink icon={<Globe className="w-6 h-6" />} title="OWN WEB" url="www............" />
-              </div>
-              <div className="mt-4 flex justify-center border-t pt-2">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <MoreHorizontal className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* --- Feedback (Viewer can only add, not see others' feedback) --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-1 bg-gray-800 rounded-full text-white">
-                  <Star className="w-3 h-3 fill-white" />
-                </div>
-                <h3 className="font-bold">Feedback</h3>
-              </div>
-
-              <div className="border-t pt-4">
-                <p className="text-xs font-semibold mb-3 text-gray-700">Rate this profile</p>
-                <div className="flex gap-1 mb-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <button
-                      key={i}
-                      onMouseEnter={() => setHoverRating(i)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setNewFeedback({ ...newFeedback, rating: i })}
-                      className="p-1"
-                    >
-                      <Star
-                        className={`w-5 h-5 transition-colors ${
-                          i <= (hoverRating || newFeedback.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                        }`}
                       />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left: Info */}
+                    <div className="flex-1">
+                      <div className="mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                          <h1 className="text-2xl font-bold text-gray-900">
+                            Alex Anderson <span className="text-gray-500 text-lg font-normal">(He/Him)</span>
+                          </h1>
+                          <span className="w-fit flex items-center gap-1 text-blue-700 bg-blue-50 border border-blue-200 text-[10px] px-2 py-0.5 rounded font-medium">
+                          <CheckCircle className="w-3 h-3" /> Verified
+                        </span>
+                        </div>
+                        <p className="text-base text-gray-900 font-medium mb-1">Product Manager | UX Enthusiast</p>
+                        <p className="text-sm text-gray-500 font-medium">Stanford University</p>
+                        <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                          <Globe className="w-3 h-3" /> Colombo, Western Province, Sri Lanka
+                        </p>
+                      </div>
+
+                      {/* About Section */}
+                      <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <h3 className="text-sm font-semibold mb-2 text-gray-900">About</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Passionate product manager with expertise in digital transformation. Creative problem solver committed to user-centric design and innovation.
+                        </p>
+                      </div>
+
+                      {/* Action Buttons (Viewer Perspective) */}
+                      <div className="flex gap-3 mb-4">
+                        <button
+                            onClick={() => setIsConnected(!isConnected)}
+                            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-semibold text-sm transition-colors ${
+                                isConnected
+                                    ? "bg-white border border-gray-400 text-gray-600 hover:bg-gray-50"
+                                    : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                            }`}
+                        >
+                          {isConnected ? (
+                              <>Poked</>
+                          ) : (
+                              <><UserPlus className="w-4 h-4" /> poke for help</>
+                          )}
+                        </button>
+
+                        <button className="flex-1 flex items-center justify-center gap-2 border border-blue-600 text-blue-600 py-2 rounded-full hover:bg-blue-50 font-semibold text-sm transition-colors">
+                          <Mail className="w-4 h-4" /> Message
+                        </button>
+
+                        <button className="px-3 border border-gray-400 rounded-full hover:bg-gray-50 text-gray-600">
+                          <MoreHorizontal className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Right: Skills Box */}
+                    <div className="lg:w-64 flex-shrink-0">
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm h-full">
+                        <h3 className="font-bold text-sm mb-4">Top Skills</h3>
+                        <div className="space-y-4">
+                          <SkillItem
+                              icon={<FlaskConical className="w-4 h-4" />}
+                              title="Web App Dev"
+                              sub="(React)"
+                              stars={4}
+                          />
+                          <SkillItem
+                              icon={<FlaskConical className="w-4 h-4" />}
+                              title="Mobile Dev"
+                              sub="(Kotlin)"
+                              stars={3}
+                          />
+                          <SkillItem
+                              icon={<FlaskConical className="w-4 h-4" />}
+                              title="Programming"
+                              sub="(Python)"
+                              stars={3}
+                          />
+                        </div>
+                        <button className="w-full mt-4 py-2 text-xs font-semibold text-gray-500 border-t hover:bg-gray-50 transition-colors">
+                          Show all skills
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* --- Posts Feed --- */}
+              <div className="space-y-4">
+                <PostCard
+                    name="Alex Anderson"
+                    time="3d ago"
+                    content="Just finished a great workshop on UX Accessibility. It's amazing how small changes can make such a big difference for users."
+                    hasImage={true}
+                />
+                <PostCard
+                    name="Alex Anderson"
+                    time="5d ago"
+                    content="Looking for recommendations for advanced React patterns. Drop your favorite resources below! 👇"
+                    hasImage={false}
+                />
+              </div>
+            </div>
+
+            {/* ================= RIGHT COLUMN ================= */}
+            <div className="w-full lg:w-80 space-y-4">
+
+              {/* --- Portfolio Links --- */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-4">
+                <h3 className="font-bold text-gray-900 mb-4 text-sm">Portfolio Links</h3>
+                <div className="space-y-3">
+                  <PortfolioLink icon={<Github className="w-5 h-5" />} title="GitHub" url="github.com/alex" />
+                  <PortfolioLink icon={<Linkedin className="w-5 h-5" />} title="LinkedIn" url="linkedin.com/in/alex" />
+                  <PortfolioLink icon={<Globe className="w-5 h-5" />} title="Website" url="alex.dev" />
+                </div>
+              </div>
+
+              {/* --- Feedback Section (Interactive) --- */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-sm">Feedback</h3>
+                    <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full text-gray-600 font-medium">12 Reviews</span>
+                  </div>
+                  <div className="flex gap-0.5">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm font-bold ml-1">4.5</span>
+                  </div>
+                </div>
+
+                {/* Add Feedback Input */}
+                <div className="bg-blue-50/50 rounded-lg p-3 border border-blue-100 mb-4">
+                  <p className="text-xs font-semibold mb-2 text-gray-700">Leave a review for Alex</p>
+                  <div className="flex gap-1 mb-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <button
+                            key={i}
+                            onMouseEnter={() => setHoverRating(i)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => setNewFeedback({ ...newFeedback, rating: i })}
+                            className="p-0.5 focus:outline-none transition-transform hover:scale-110"
+                        >
+                          <Star
+                              className={`w-5 h-5 transition-colors ${
+                                  i <= (hoverRating || newFeedback.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                              }`}
+                          />
+                        </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                        type="text"
+                        placeholder="Write a comment..."
+                        value={newFeedback.comment}
+                        onChange={(e) => setNewFeedback({ ...newFeedback, comment: e.target.value })}
+                        className="flex-1 border border-gray-300 rounded-md px-3 py-1.5 text-xs focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    />
+                    <button
+                        onClick={handleFeedbackSubmit}
+                        disabled={newFeedback.rating === 0 || !newFeedback.comment.trim()}
+                        className="p-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-md transition-colors shadow-sm"
+                    >
+                      <Send className="w-4 h-4" />
                     </button>
+                  </div>
+                </div>
+
+                {/* Feedback List */}
+                <div className="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+                  {feedbackItems.map((item) => (
+                      <div key={item.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="text-xs font-bold text-gray-800">{item.name}</span>
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <Star
+                                    key={i}
+                                    className={`w-2.5 h-2.5 ${
+                                        i <= item.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"
+                                    }`}
+                                />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600 italic">"{item.comment}"</p>
+                      </div>
                   ))}
                 </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Share your feedback..."
-                    value={newFeedback.comment}
-                    onChange={(e) => setNewFeedback({ ...newFeedback, comment: e.target.value })}
-                    className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-blue-500"
-                  />
-                  <button
-                    onClick={handleFeedbackSubmit}
-                    disabled={newFeedback.rating === 0 || !newFeedback.comment.trim()}
-                    className="p-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded transition-colors"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
+              </div>
+
+              {/* --- Similar Profiles --- */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-4">
+                <h3 className="font-bold text-sm mb-4">People with similar skills</h3>
+                <div className="space-y-4">
+                  {/* These are read-only views with Average ratings */}
+                  <SimilarProfile name="Alex Johnson" role="Senior Product Designer" avgRating={4.8} />
+                  <SimilarProfile name="Jamie Smith" role="UX Research Lead" avgRating={4.5} />
+                  <SimilarProfile name="Chris Brown" role="Head of Product Mgmt" avgRating={4.9} />
+                  <SimilarProfile name="Dana Lee" role="Chief Usability Officer" avgRating={4.2} />
                 </div>
               </div>
             </div>
-
-            {/* --- Similar Profiles --- */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="font-bold text-sm mb-4">Other Similar Skills Profiles</h3>
-              <div className="space-y-4">
-                <SimilarProfile name="Alex Johnson" role="Senior Product Designer" showRating={true} />
-                <SimilarProfile name="Jamie Smith" role="UX Research Lead" showRating={true} />
-                <SimilarProfile name="Chris Brown" role="Head of Product Mgmt" showRating={true} />
-                <SimilarProfile name="Dana Lee" role="Chief Usability Officer" showRating={true} />
-                <SimilarProfile name="Pat Kim" role="Director of User Exp" showRating={true} />
-              </div>
-            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
   )
 }
 
-// Helper Components
+// --- Helper Components ---
+
 function NavItem({ icon, label }) {
   return (
-    <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 group">
-      <div className="group-hover:scale-110 transition-transform">{icon}</div>
-      <span className="text-[10px] uppercase font-medium tracking-wide">{label}</span>
-    </button>
+      <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 group">
+        <div className="group-hover:scale-110 transition-transform">{icon}</div>
+        <span className="text-[10px] sm:text-xs font-medium tracking-wide">{label}</span>
+      </button>
   )
 }
 
 function SkillItem({ icon, title, sub, stars }) {
   return (
-    <div className="flex flex-col">
-      <div className="flex items-start gap-2 mb-1">
-        <div className="p-1 border border-gray-300 rounded">{icon}</div>
-        <div>
-          <p className="text-xs font-bold leading-tight">{title}</p>
-          <p className="text-[10px] text-gray-500">{sub}</p>
+      <div className="flex items-center justify-between group cursor-default">
+        <div className="flex items-start gap-3">
+          <div className="p-1.5 bg-gray-100 rounded text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">{icon}</div>
+          <div>
+            <p className="text-sm font-bold leading-tight text-gray-800">{title}</p>
+            <p className="text-[11px] text-gray-500">{sub}</p>
+          </div>
+        </div>
+        <div className="flex gap-0.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="p-0.5 rounded-sm">
+                <Star className={`w-3 h-3 ${i <= stars ? "fill-gray-700 text-gray-700" : "text-gray-200"}`} />
+              </div>
+          ))}
         </div>
       </div>
-      <div className="flex gap-0.5 pl-8">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className={`p-0.5 border border-gray-400 rounded-sm ${i <= stars ? "bg-gray-600" : "bg-transparent"}`}
-          >
-            <Star className={`w-2 h-2 ${i <= stars ? "fill-white text-white" : "text-gray-300"}`} />
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }
 
 function PostCard({ name, time, content, hasImage }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white">
-            <User className="w-5 h-5" />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-300 p-0 overflow-hidden">
+        <div className="p-4 pb-2">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-800 overflow-hidden">
+                {/* Placeholder Avatar */}
+                <div className="w-full h-full bg-slate-300"></div>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-gray-900 hover:text-blue-600 cursor-pointer">{name}</h4>
+                <p className="text-xs text-gray-500">{time}</p>
+              </div>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
           </div>
-          <div>
-            <h4 className="font-bold text-sm">{name}</h4>
-            <p className="text-xs text-gray-500">{time}</p>
+          <p className="text-sm text-gray-800 mb-2 whitespace-pre-line leading-relaxed">{content}</p>
+        </div>
+
+        {hasImage && (
+            <div className="w-full h-64 bg-gray-200 mb-2"></div>
+        )}
+
+        <div className="px-4 py-2 border-t border-gray-100">
+          <div className="flex justify-between pt-1">
+            <button className="flex items-center gap-1.5 px-3 py-2 rounded text-gray-600 hover:bg-gray-100 font-medium text-sm transition-colors flex-1 justify-center">
+              <ThumbsUp className="w-4 h-4" /> <span className="hidden sm:inline">Like</span>
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-2 rounded text-gray-600 hover:bg-gray-100 font-medium text-sm transition-colors flex-1 justify-center">
+              <MessageCircle className="w-4 h-4" /> <span className="hidden sm:inline">Comment</span>
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-2 rounded text-gray-600 hover:bg-gray-100 font-medium text-sm transition-colors flex-1 justify-center">
+              <Share2 className="w-4 h-4" /> <span className="hidden sm:inline">Share</span>
+            </button>
           </div>
         </div>
-        <div className="flex gap-2 text-gray-400">
-          <MoreHorizontal className="w-5 h-5 cursor-pointer" />
-          <X className="w-5 h-5 cursor-pointer" />
-        </div>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{content}</p>
-      {hasImage && <div className="h-48 bg-gray-200 rounded-md mb-4"></div>}
-      <div className="flex justify-between border-t border-gray-100 pt-3">
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <ThumbsUp className="w-4 h-4" /> Like
-        </button>
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <MessageCircle className="w-4 h-4" /> Comment
-        </button>
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <Share2 className="w-4 h-4" /> Share
-        </button>
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-600 text-sm">
-          <Send className="w-4 h-4" /> Send
-        </button>
-      </div>
-    </div>
   )
 }
 
 function PortfolioLink({ icon, title, url }) {
   return (
-    <div className="flex items-center gap-3 p-3 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer">
-      <div className="text-gray-700">{icon}</div>
-      <div className="flex-1 overflow-hidden">
-        <p className="text-xs font-bold uppercase">{title}</p>
-        <div className="flex items-center gap-1 text-gray-500">
-          <span className="text-xs">🔗</span>
-          <p className="text-[10px] truncate">{url}</p>
+      <div className="flex items-center gap-4 p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md cursor-pointer transition-all bg-gray-50">
+        <div className="text-gray-700 bg-white p-2 rounded shadow-sm">{icon}</div>
+        <div className="flex-1 overflow-hidden">
+          <p className="text-xs font-bold uppercase text-gray-800 tracking-wide">{title}</p>
+          <p className="text-xs text-blue-600 truncate">{url}</p>
         </div>
+        <ChevronLeft className="w-4 h-4 text-gray-400 rotate-180" />
       </div>
-    </div>
   )
 }
 
-function SimilarProfile({ name, role, showRating }) {
-  const [rating, setRating] = useState(0)
-  const [hoverRating, setHoverRating] = useState(0)
-
+function SimilarProfile({ name, role, avgRating }) {
   return (
-      <div className="flex flex-col gap-2 border-b border-gray-100 pb-3 last:border-0">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0"></div>
-            <div className="min-w-0">
-              <p className="text-xs font-bold">{name}</p>
-              <p className="text-[10px] text-gray-500 truncate">{role}</p>
+      <div className="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+        <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start">
+            <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+            {/* Static Average Rating Display */}
+            <div className="flex items-center gap-1 bg-yellow-50 px-1.5 py-0.5 rounded border border-yellow-100">
+              <Star className="w-2.5 h-2.5 fill-orange-400 text-orange-400" />
+              <span className="text-[10px] font-bold text-orange-600">{avgRating}</span>
             </div>
           </div>
-          {showRating && (
-              <div className="flex gap-0.5 ml-2">
-                {[1, 2, 3, 4, 5].map((i) => (
-                    <button
-                        key={i}
-                        onMouseEnter={() => setHoverRating(i)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setRating(i)}
-                        className="p-0.5"
-                    >
-                      <Star
-                          className={`w-3 h-3 transition-colors ${
-                              i <= (hoverRating || rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                          }`}
-                      />
-                    </button>
-                ))}
-              </div>
-          )}
+          <p className="text-xs text-gray-500 truncate">{role}</p>
+          <button className="mt-1 text-xs font-semibold text-gray-500 border border-gray-400 rounded-full px-3 py-0.5 hover:border-black hover:text-black transition-colors">
+            View Profile
+          </button>
         </div>
-        <button className="w-full text-center border border-gray-400 rounded py-1 text-[10px] font-medium hover:bg-gray-50">
-          View Profile
-        </button>
       </div>
   )
 }
