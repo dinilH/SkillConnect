@@ -1,6 +1,8 @@
 import React from 'react';
 import { Paperclip, Send } from 'lucide-react';
 
+
+
 const MessageInput = () => {
   return (
     <div className="p-4 border-t border-gray-200 bg-white">
@@ -26,6 +28,7 @@ const MessageInput = () => {
           <Send className="w-4 h-4" />
           <span className="text-sm font-medium">Send</span>
         </button>
+        
       </div>
     </div>
   );
