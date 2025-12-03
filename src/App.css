@@ -1,3 +1,15 @@
+@import "tailwindcss";
+
+
+.App {
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+html, body, #root {
+  background-color: #ffffff;
+  min-height: 100vh;
+  margin: 0;
+}
 #root {
   max-width: 1280px;
   margin: 0 auto;
