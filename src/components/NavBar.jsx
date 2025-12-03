@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const links = [
-    { label: "Home" },
-    { label: "Skill Search" },
-    { label: "Skill Request" },
-    { label: "Community" },
+    { label: "Home", to: "/" },
+    { label: "Skill Search", to: "/skill-search" },
+    { label: "Skill Request", to: "/skill-request" },
+    { label: "Community", to: "/community" },
   ];
 
   return (
@@ -27,19 +29,21 @@ export default function NavBar() {
       "
     >
       {/* Left: Brand */}
-      <div className="text-white font-semibold text-xl tracking-wide">
+      <Link to="/" className="text-white font-semibold text-xl tracking-wide" style={{ color: '#fff' }}>
         SkillLink
-      </div>
+      </Link>
 
       {/* Middle: Nav Links (desktop) */}
        <div className="hidden md:flex gap-8 text-white text-md font-medium">
         {links.map((l) => (
-          <span
+          <Link
             key={l.label}
-            className="text-white/90 hover:text-[#A589FD] transition cursor-default select-none"
+            to={l.to}
+            className="text-white hover:text-[#A589FD] transition"
+            style={{ color: '#fff' }}
           >
             {l.label}
-          </span>
+          </Link>
         ))}
       </div>
 
@@ -47,15 +51,23 @@ export default function NavBar() {
       <div className="flex items-center gap-3">
         <FaUserCircle className="text-white text-2xl cursor-pointer hover:text-[#A589FD] transition" />
 
-        <button className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
+        <button
+          onClick={() => navigate('/signin')}
+          className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
           bg-linear-to-r from-[#27229f] to-[#7D4DF4] shadow-md shadow-[#7D4DF4]/40 
-          hover:opacity-80 transition">
+          hover:opacity-80 transition"
+          style={{ color: '#fff' }}
+        >
           Sign In
         </button>
 
-        <button className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
+        <button
+          onClick={() => navigate('/signup')}
+          className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
           bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 
-          hover:opacity-90 transition">
+          hover:opacity-90 transition"
+          style={{ color: '#fff' }}
+        >
           Sign Up
         </button>
 
@@ -82,8 +94,10 @@ export default function NavBar() {
           {links.map((l) => (
             <button
               key={l.label}
-              onClick={() => setOpen(false)}
+              onClick={() => { navigate(l.to); setOpen(false); }}
               className="text-left w-full px-3 py-2 rounded-lg text-white hover:bg-white/5 transition"
+              aria-label={`Go to ${l.label}`}
+              style={{ color: '#fff' }}
             >
               {l.label}
             </button>
@@ -91,15 +105,17 @@ export default function NavBar() {
 
           <div className="flex flex-col sm:flex-row gap-2 mt-2 px-2">
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); navigate('/signin'); }}
               className="w-full px-4 py-2 rounded-xl text-white border border-white/30 hover:bg-white/10 transition"
+              style={{ color: '#fff' }}
             >
               Sign In
             </button>
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); navigate('/signup'); }}
               className="w-full px-4 py-2 rounded-xl text-white font-semibold 
                 bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
+              style={{ color: '#fff' }}
             >
               Sign Up
             </button>
@@ -109,4 +125,3 @@ export default function NavBar() {
     </nav>
   );
 }
-// ...existing code...
