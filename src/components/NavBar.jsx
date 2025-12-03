@@ -1,10 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY || window.pageYOffset;
+      if (!ticking.current) {
+        window.requestAnimationFrame(() => {
+          if (currentY > lastScrollY.current && currentY > 60) {
+            // scrolling down and passed threshold -> hide
+            setVisible(false);
+          } else {
+            // scrolling up -> show
+            setVisible(true);
+          }
+          lastScrollY.current = currentY;
+          ticking.current = false;
+        });
+        ticking.current = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const links = [
     { label: "Home", to: "/" },
@@ -15,8 +41,8 @@ export default function NavBar() {
 
   return (
     <nav
-      className="
-        fixed top-4 left-1/2 -translate-x-1/2
+      className={
+        `fixed top-4 left-1/2 -translate-x-1/2
         w-[90%] max-w-5xl
         z-50
         flex items-center justify-between
@@ -26,7 +52,9 @@ export default function NavBar() {
         rounded-3xl
         border border-white/30
         shadow-lg shadow-[#7D4DF4]/30
-      "
+        transform transition-transform duration-300
+        ${visible ? 'translate-y-0' : '-translate-y-full'}`
+      }
     >
       {/* Left: Brand */}
       <Link to="/" className="text-white font-semibold text-xl tracking-wide" style={{ color: '#fff' }}>
