@@ -2,7 +2,7 @@ import React from "react";
 
 export default function CommunityTabs({ tabs, active, setActive }) {
   return (
-    <div className="flex bg-white border-2 border-purple-300 rounded-lg overflow-x-auto shadow-sm w-full">
+    <div className="flex bg-white border-2 border-purple-300 rounded-lg overflow-x-auto shadow-sm">
       {tabs.map((t) => (
         <button
           key={t}
