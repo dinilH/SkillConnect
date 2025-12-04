@@ -114,8 +114,10 @@ export default function ProfileViewerView() {
                             className={`flex-1 flex  bg-gradient-to-r from-[#7D4DF4] to-[#00F0FF] items-center justify-center gap-2 py-2 rounded-full font-semibold text-sm transition-colors ${
                                 isConnected
                                     ? "bg-white border border-gray-400 text-white hover:bg-gray-50"
-                                    : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                                    : " text-white font-semibold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
                             }`}
+
+
                         >
                           {isConnected ? (
                               <>Poked</>
@@ -391,7 +393,7 @@ function SimilarProfile({ name, role, avgRating }) {
             </div>
           </div>
           <p className="text-xs text-gray-500 truncate">{role}</p>
-          <button className="mt-1 text-xs font-semibold bg-gradient-to-r from-[#7D4DF4] to-[#00F0FF] border border-gray-300 text-white rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
+          <button className="mt-1 text-xs  bg-gradient-to-r text-white font-semibold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
             View Profile
           </button>
         </div>

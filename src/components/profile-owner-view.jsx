@@ -238,10 +238,9 @@ export default function ProfileOwnerView() {
                               setShowPokesPopup(true);
                               setNewPokesCount(0);
                             }}
-                            className="relative flex-1 bg-gradient-to-r from-[#7D4DF4] to-[#00F0FF]
-           text-white py-2 rounded-full
-           hover:from-[#9572F9] hover:to-[#703BEA]
+                            className=" rounded-full relative flex-1 bg-gradient-to-r text-white font-semibold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] hover:to-[#703BEA]
            font-semibold text-sm shadow-sm transition-all"
+
 
 
                         >
@@ -1066,7 +1065,7 @@ function SimilarProfile({ name, role, avgRating }) {
             </div>
           </div>
           <p className="text-xs text-gray-500 truncate">{role}</p>
-          <button className="mt-1 text-xs font-semibold bg-gradient-to-r from-[#7D4DF4] to-[#00F0FF] border border-gray-300 text-white rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
+          <button className="mt-1 text-xs  bg-gradient-to-r text-white font-semibold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
             View Profile
           </button>
 
