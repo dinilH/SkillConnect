@@ -7,7 +7,7 @@ import Footer from './components/Footer.jsx';
 import Home from './Pages/Home/Home.jsx';
 import SkillSearch from './Pages/SkillSearch/Components/SkillSearch.jsx';
 import SkillRequest from './Pages/SkillRequest/Components/SkillRequest.jsx';
-import Community from './Pages/Community.jsx';
+import Community from './Pages/Community/Community.jsx';
 import MessagePage from './Pages/Message/MessagePage.jsx';
 import Profile from './Pages/Profile/Profile.jsx';
 import FloatingChatButton from './components/FloatingChatButton.jsx';
