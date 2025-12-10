@@ -3,14 +3,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-
 const User = require("./models/User");
-
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// -------------------------------------
 // ENVIRONMENT VARIABLES
 // -------------------------------------
 const PORT = process.env.PORT || 5000;
@@ -21,7 +18,6 @@ if (!MONGO_URL) {
     process.exit(1);
 }
 
-// -------------------------------------
 // MongoDB CONNECTION
 // -------------------------------------
 mongoose
@@ -29,7 +25,6 @@ mongoose
     .then(() => console.log("✅ MongoDB Connected"))
     .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// -------------------------------------
 // CREATE ACCOUNT ROUTE
 // -------------------------------------
 app.post("/api/create-account", async (req, res) => {
@@ -72,7 +67,6 @@ app.post("/api/create-account", async (req, res) => {
     }
 });
 
-// -------------------------------------
 // LOGIN ROUTE
 // -------------------------------------
 app.post("/api/login", async (req, res) => {
@@ -101,7 +95,6 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-// -------------------------------------
 // START SERVER
 // -------------------------------------
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

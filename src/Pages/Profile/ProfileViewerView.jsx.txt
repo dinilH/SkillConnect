@@ -1,5 +1,5 @@
 import { useState } from "react"
-import NavBar from "../Home/components/NavBar";
+import NavBar from "../components/NavBar";
 
 import {
   Home,
@@ -56,12 +56,12 @@ export default function ProfileViewerView() {
         <NavBar />
 
 
-        <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6 pt-35">
+        <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6 pt-28">
 
           <div className="flex flex-col lg:flex-row gap-6">
 
 
-            {/* ================= LEFT COLUMN ================= */}
+          {/* ================= LEFT COLUMN ================= */}
             <div className="flex-1 min-w-0">
               {/* --- Profile Card --- */}
               <div className="bg-white sm:rounded-xl shadow-[0_0_20px_#A589FD] overflow-hidden mb-4 relative">

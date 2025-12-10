@@ -20,7 +20,7 @@ function App() {
                 <Route path="/skill-request" element={<SkillRequest />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/chat" element={<MessagePage />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/home" element={<Profile />} />
                 <Route path="/signup" element={<Signup />} />
             </Routes>
 

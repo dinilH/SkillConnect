@@ -13,7 +13,6 @@ function LoginPageV2() {
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
         try {
             const res = await fetch("http://localhost:5000/api/login", {
                 method: "POST",
@@ -26,7 +25,7 @@ function LoginPageV2() {
             if (res.ok && data.success) {
                 setTimeout(() => {
                     setIsLoading(false);
-                    navigate("/profile");
+                    navigate("/home");
                 }, 800);
             } else {
                 setIsLoading(false);
