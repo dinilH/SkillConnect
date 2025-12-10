@@ -1,5 +1,5 @@
 import { useState } from "react"
-import NavBar from "../Home/components/NavBar";
+import NavBar from "../components/NavBar";
 import {
   Home,
   MessageCircle,
@@ -141,7 +141,7 @@ export default function ProfileOwnerView() {
         <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6 pt-28">
 
 
-          <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
 
             {/* ================= LEFT COLUMN (Profile & Feed) ================= */}
             <div className="flex-1 min-w-0">
@@ -150,7 +150,7 @@ export default function ProfileOwnerView() {
               <div className="bg-white sm:rounded-xl shadow-[0_0_20px_#A589FD] overflow-hidden mb-4 relative">
 
 
-                {/* Cover Image */}
+              {/* Cover Image */}
                 <div
                     className="h-40 sm:h-48 relative group rounded-b-xl overflow-hidden"
                     style={

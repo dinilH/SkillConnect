@@ -1,4 +1,6 @@
 import { useState } from "react"
+import NavBar from "../Home/components/NavBar";
+
 import {
   Home,
   MessageCircle,
@@ -21,7 +23,7 @@ import {
   Mail
 } from "lucide-react"
 
-export default function ProfileViewerView({ onBack }) {
+export default function ProfileViewerView() {
   // --- State ---
   const [isConnected, setIsConnected] = useState(false)
 
@@ -50,77 +52,14 @@ export default function ProfileViewerView({ onBack }) {
 
   return (
       <div className="min-h-screen bg-[#FFFFFF] font-sans text-gray-800">
-        {/* ================= HEADER ================= */}
-        <header className="bg-white border-b border-[#A589FD] sticky top-0 z-40 px-4 shadow-sm">
-          <div className="max-w-7xl mx-auto h-14 flex items-center justify-between">
 
-            {/* LEFT SIDE */}
-            <div className="flex items-center gap-4 flex-1">
-              <button
-                  onClick={onBack}
-                  className="flex items-center gap-1 text-gray-600 hover:text-black font-medium transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-
-              </button>
-
-              {/* SEARCH BAR */}
-              <div className="relative w-full max-w-xs hidden md:block">
-  <span className="absolute left-3 top-2 text-[#7D4DF4]">
-    <Search className="w-5 h-5" />
-  </span>
-
-                <input
-                    type="text"
-                    placeholder="Search"
-                    className="w-full pl-9 pr-4 py-1.5
-               bg-[#FFFFFF]
-               border border-[#A589FD]
-               rounded
-               text-black
-               focus:ring-1 focus:ring-[#7D4DF4]
-               focus:border-[#7D4DF4]
-               transition-all
-               placeholder-gray-500"
-                />
-              </div>
-            </div>
-
-            {/* LOGO*/}
-            <div className="flex justify-center flex-none px-0 gap-0">
-              <div className="w-50 h-23 overflow-hidden">
-                <img
-                    src="/src/images/logo.png"
-                    alt="Logo2"
-                    className="w-full h-full object-contain"
-                />
-              </div>
-            </div>
+        <NavBar />
 
 
+        <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6 pt-35">
 
-            {/* RIGHT SIDE NAVIGATION */}
-            <nav className="flex items-center gap-6 sm:gap-8 flex-1 justify-end">
-              <NavItem icon={<Home className="w-5 h-5 text-[#7D4DF4]" />} label="Home"  />
-              <NavItem icon={<User className="w-5 h-5 text-gray-700 hover:text-[#7D4DF4]" />} label="Network" />
-              <NavItem icon={<MessageCircle className="w-5 h-5 text-gray-700 hover:text-[#7D4DF4]" />} label="Messaging" />
-              <NavItem icon={<Bell className="w-5 h-5 text-gray-700 hover:text-[#7D4DF4]" />} label="Notifs" />
-
-              <div className="border-l pl-6 border-[#A589FD] hidden sm:block">
-                <div className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden cursor-pointer">
-                  <img
-                      src="/user-profile-illustration.png"
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-            </nav>
-          </div>
-        </header>
-
-        <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6">
           <div className="flex flex-col lg:flex-row gap-6">
+
 
             {/* ================= LEFT COLUMN ================= */}
             <div className="flex-1 min-w-0">
@@ -175,8 +114,10 @@ export default function ProfileViewerView({ onBack }) {
                             className={`flex-1 flex  bg-gradient-to-r from-[#7D4DF4] to-[#00F0FF] items-center justify-center gap-2 py-2 rounded-full font-semibold text-sm transition-colors ${
                                 isConnected
                                     ? "bg-white border border-gray-400 text-white hover:bg-gray-50"
-                                    : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                                    : " text-white font-semibold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
                             }`}
+
+
                         >
                           {isConnected ? (
                               <>Poked</>
@@ -407,7 +348,6 @@ function PostCard({ name, time, content, hasImage }) {
         {hasImage && (
             <div className="w-full h-64 bg-gray-200 mb-2"></div>
         )}
-
         <div className="px-4 py-2 border-t border-gray-100">
           <div className="flex justify-between pt-1">
             <button className="flex items-center gap-1.5 px-3 py-2 rounded text-gray-600 hover:bg-gray-100 font-medium text-sm transition-colors flex-1 justify-center">
@@ -452,7 +392,7 @@ function SimilarProfile({ name, role, avgRating }) {
             </div>
           </div>
           <p className="text-xs text-gray-500 truncate">{role}</p>
-          <button className="mt-1 text-xs font-semibold bg-gradient-to-r from-[#7D4DF4] to-[#00F0FF] border border-gray-300 text-white rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
+          <button className="mt-1 text-xs  bg-gradient-to-r text-white font-semibold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
             View Profile
           </button>
         </div>
