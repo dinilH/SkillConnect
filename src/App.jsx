@@ -15,13 +15,14 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<LoginPage />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/skill-search" element={<SkillSearch />} />
                 <Route path="/skill-request" element={<SkillRequest />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/chat" element={<MessagePage />} />
-                <Route path="/home" element={<Profile />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/signin" element={<LoginPage />} />
             </Routes>
 
             <FloatingChatButton />

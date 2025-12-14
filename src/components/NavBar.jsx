@@ -76,8 +76,8 @@ export default function NavBar() {
       </div>
 
       {/* Right: Profile + Auth Buttons */}
-      <div onClick={() => navigate('/profile')} className="flex items-center gap-3">
-        <FaUserCircle className="text-white text-2xl cursor-pointer hover:text-[#A589FD] transition" />
+      <div className="flex items-center gap-3">
+        <FaUserCircle onClick={() => navigate('/profile')} className="text-white text-2xl cursor-pointer hover:text-[#A589FD] transition" />
 
         <button
           onClick={() => navigate('/signin')}
