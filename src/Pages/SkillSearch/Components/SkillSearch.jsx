@@ -22,24 +22,28 @@ export default function SkillSearch() {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-[#F3E8FF] to-white w-5xl shadow-xl rounded-3xl">
+    <div className="min-h-screen bg-linear-to-br from-[#F3E8FF] to-white w-full">
 
-<NavBar/>
-      <SearchBar />
+      <NavBar />
 
-      <div className="mt-10 flex gap-6 pl-6">
-        <Filters />
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <SearchBar />
 
-        <div className="flex-1 pr-6">
-          <p className="text-gray-700 mb-4 text-sm">{users.length} results found</p>
-          <div className="flex flex-col gap-6">
-            {users.map((u, i) => (
-              <ProfileCard key={i} user={u} />
-            ))}
+        <div className="mt-8 flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-64 shrink-0">
+            <Filters />
+          </div>
+
+          <div className="flex-1">
+            <p className="text-gray-700 mb-4 text-sm">{users.length} results found</p>
+            <div className="flex flex-col gap-6">
+              {users.map((u, i) => (
+                <ProfileCard key={i} user={u} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

@@ -1,9 +1,9 @@
 export default function Hero() {
   return (
     <div className="pt-24">
-      {/* Hero Section - full-bleed background */}
+      {/* Hero Section */}
       <section className="w-full bg-linear-to-br from-[#7D4DF4] to-[#A589FD] text-white py-20">
-        <div className="w-full max-w-7xl mx-auto flex flex-col items-center px-6">
+        <div className="w-full flex flex-col items-center px-6">
 
           {/* Heading */}
           <h1 className="text-4xl md:text-5xl font-extrabold text-center leading-tight">

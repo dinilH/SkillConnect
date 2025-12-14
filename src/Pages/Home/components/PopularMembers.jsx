@@ -33,11 +33,9 @@ export default function PopularMembers() {
   ];
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-5 text-gray-900">
+    <div className="w-full bg-white backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl p-6 text-gray-900">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="font-semibold text-lg">
-          Popular Members / Top Helpers
-        </h2>
+        <h2 className="font-semibold text-lg">Popular Members / Top Helpers</h2>
         <button className="text-sm text-blue-600 hover:underline">View All</button>
       </div>
 

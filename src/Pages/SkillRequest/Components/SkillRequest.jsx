@@ -39,11 +39,11 @@ export default function SkillRequests() {
   ];
 
   return (
-        <div className=" bg-gradient-to-br from-[#F3E8FF] to-white w-5xl shadow-xl rounded-3xl mt-15">
+    <div className="min-h-screen bg-linear-to-br from-[#F3E8FF] to-white w-full">
 
       <NavBar />
 
-      <div className="pt-10 px-10">
+      <div className="max-w-7xl mx-auto pt-8 px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -52,7 +52,7 @@ export default function SkillRequests() {
         </div>
 
 {/* Search Row (Dropdowns) */}
-<div className="grid grid-cols-4 gap-4 mt-6">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
   {[
     {
       label: "All Categories",
@@ -71,17 +71,7 @@ export default function SkillRequests() {
       options: ["Today", "This Week", "This Month"],
     },
   ].map((item, i) => (
-    <div
-      key={i}
-      className="
-        h-12 rounded-xl
-        bg-white 
-        border border-purple-300
-        shadow-sm
-        flex items-center
-        px-4 text-sm font-medium text-gray-700
-      "
-    >
+    <div key={i} className="h-12 rounded-xl bg-white border border-purple-300 shadow-sm flex items-center px-4 text-sm font-medium text-gray-700">
       <select
         className="
           w-full bg-transparent outline-none

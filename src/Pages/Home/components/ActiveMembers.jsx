@@ -8,7 +8,7 @@ export default function ActiveMembers() {
   ];
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-5 text-gray-900">
+    <div className="w-full bg-white backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl p-6 text-gray-900">
       <h2 className="font-semibold text-lg mb-3">Active Members Now</h2>
 
       <div className="space-y-3">

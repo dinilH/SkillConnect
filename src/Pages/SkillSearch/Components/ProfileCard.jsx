@@ -8,11 +8,7 @@ export default function ProfileCard({ user }) {
     ">
 
       {/* Image Box */}
-      <div className="
-        w-20 h-20 rounded-2xl bg-gradient-to-br
-        from-[#6C38FF] via-[#4C2AFF] to-[#EC38F5]
-        flex items-center justify-center text-white font-bold shadow-lg
-      ">
+      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-[#6C38FF] via-[#4C2AFF] to-[#EC38F5] flex items-center justify-center text-white font-bold shadow-lg">
         IMG
       </div>
 
