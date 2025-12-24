@@ -1,4 +1,5 @@
-//D:\Web\SkillConnect1\server\models\User.js
+//This file defines the User model schema for MongoDB using Mongoose.
+
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
