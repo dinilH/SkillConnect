@@ -9,6 +9,7 @@ import Community from './Pages/Community/Community.jsx';
 import MessagePage from './Pages/Message/MessagePage.jsx';
 import Profile from './Pages/Profile/Profile.jsx';
 import Signup from './Pages/Signup/CreateAccountForm.jsx';
+import AuthModal from './components/AuthModal.jsx';
 
 function App() {
 
@@ -26,6 +27,8 @@ function App() {
             </Routes>
 
             <FloatingChatButton />
+            {/* Global Auth Modal */}
+            <AuthModal />
         </Router>
     );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
+import { useModal } from "../ModalContext.jsx";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
@@ -10,6 +11,7 @@ export default function NavBar() {
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
   const { isAuthenticated, user, logout } = useAuth();
+  const { openAuthModal } = useModal();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,7 +94,7 @@ export default function NavBar() {
         {!isAuthenticated ? (
           <>
             <button
-              onClick={() => navigate('/signin')}
+              onClick={() => openAuthModal('signin')}
               className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
               bg-linear-to-r from-[#27229f] to-[#7D4DF4] shadow-md shadow-[#7D4DF4]/40 
               hover:opacity-80 transition"
@@ -101,7 +103,7 @@ export default function NavBar() {
               Sign In
             </button>
             <button
-              onClick={() => navigate('/signup')}
+              onClick={() => openAuthModal('signup')}
               className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
               bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 
               hover:opacity-90 transition"
@@ -155,14 +157,14 @@ export default function NavBar() {
             {!isAuthenticated ? (
               <>
                 <button
-                  onClick={() => { setOpen(false); navigate('/signin'); }}
+                  onClick={() => { setOpen(false); openAuthModal('signin'); }}
                   className="w-full px-4 py-2 rounded-xl text-white border border-white/30 hover:bg-white/10 transition"
                   style={{ color: '#fff' }}
                 >
                   Sign In
                 </button>
                 <button
-                  onClick={() => { setOpen(false); navigate('/signup'); }}
+                  onClick={() => { setOpen(false); openAuthModal('signup'); }}
                   className="w-full px-4 py-2 rounded-xl text-white font-semibold 
                     bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
                   style={{ color: '#fff' }}

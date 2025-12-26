@@ -38,38 +38,34 @@ const MONGO_URL = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!MONGO_URL) {
-    console.error("❌ Error: MONGO_URL is not defined in .env");
+    console.error("Error: MONGO_URL is not defined in .env");
     process.exit(1);
 }
 if (!JWT_SECRET) {
-    console.error("❌ Error: JWT_SECRET is not defined in .env");
+    console.error("Error: JWT_SECRET is not defined in .env");
     process.exit(1);
 }
 
 // MongoDB CONNECTION
 mongoose
     .connect(MONGO_URL, { serverSelectionTimeoutMS: 10000, socketTimeoutMS: 45000, maxPoolSize: 10 })
-    .then(() => console.log("✅ MongoDB Connected"))
+    .then(() => console.log("MongoDB Connected"))
     .catch((err) => {
-        console.error("❌ MongoDB Error:", err);
+        console.error("MongoDB Error:", err);
         console.error(
-            "ℹ️ If using mongodb+srv, ensure SRV DNS resolves and your IP is allowlisted in Atlas Network Access."
+            "If using mongodb+srv, ensure SRV DNS resolves and your IP is allowlisted in Atlas Network Access."
         );
     });
 
 // SOCKET.IO CONNECTION HANDLING
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
-
     socket.on("user_online", (userId) => {
         onlineUsers.set(userId, socket.id);
-        console.log(`User ${userId} is online`);
     });
 
     socket.on("join_conversation", (conversationId) => {
         socket.join(conversationId);
-        console.log(`Socket ${socket.id} joined conversation ${conversationId}`);
     });
 
     socket.on("leave_conversation", (conversationId) => {
@@ -83,7 +79,6 @@ io.on("connection", (socket) => {
                 break;
             }
         }
-        console.log("User disconnected:", socket.id);
     });
 });
 

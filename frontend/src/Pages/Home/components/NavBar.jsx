@@ -2,6 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../AuthContext.jsx";
+import { useState, useEffect, useRef } from "react";
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../AuthContext.jsx";
+import { useModal } from "../../../ModalContext.jsx";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
@@ -10,6 +15,7 @@ export default function NavBar() {
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
   const { isAuthenticated, user, logout } = useAuth();
+  const { openAuthModal } = useModal();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,10 +23,8 @@ export default function NavBar() {
       if (!ticking.current) {
         window.requestAnimationFrame(() => {
           if (currentY > lastScrollY.current && currentY > 60) {
-            // scrolling down and passed threshold -> hide
             setVisible(false);
           } else {
-            // scrolling up -> show
             setVisible(true);
           }
           lastScrollY.current = currentY;
@@ -58,13 +62,11 @@ export default function NavBar() {
         ${visible ? 'translate-y-0' : '-translate-y-full'}`
       }
     >
-      {/* Left: Brand */}
       <Link to="/" className="text-white font-semibold text-xl tracking-wide" style={{ color: '#fff' }}>
         SkillLink
       </Link>
 
-      {/* Middle: Nav Links (desktop) */}
-       <div className="hidden md:flex gap-8 text-white text-md font-medium">
+      <div className="hidden md:flex gap-8 text-white text-md font-medium">
         {links.map((l) => (
           <Link
             key={l.label}
@@ -77,7 +79,6 @@ export default function NavBar() {
         ))}
       </div>
 
-      {/* Right: Profile + Auth Buttons */}
       <div className="flex items-center gap-3">
         {isAuthenticated && (
           <button
@@ -92,7 +93,7 @@ export default function NavBar() {
         {!isAuthenticated ? (
           <>
             <button
-              onClick={() => navigate('/signin')}
+              onClick={() => openAuthModal('signin')}
               className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
               bg-linear-to-r from-[#27229f] to-[#7D4DF4] shadow-md shadow-[#7D4DF4]/40 
               hover:opacity-80 transition"
@@ -101,7 +102,7 @@ export default function NavBar() {
               Sign In
             </button>
             <button
-              onClick={() => navigate('/signup')}
+              onClick={() => openAuthModal('signup')}
               className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
               bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 
               hover:opacity-90 transition"
@@ -119,7 +120,6 @@ export default function NavBar() {
           </button>
         )}
 
-        {/* Mobile menu toggle */}
         <button
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((s) => !s)}
@@ -129,7 +129,6 @@ export default function NavBar() {
         </button>
       </div>
 
-      {/* Mobile menu panel */}
       <div
         className={`absolute left-1/2 top-full -translate-x-1/2 mt-3 w-[90%] max-w-5xl md:hidden
           bg-[#7D4DF4]/15 backdrop-blur-lg rounded-2xl border border-white/10 shadow-lg
@@ -155,8 +154,35 @@ export default function NavBar() {
             {!isAuthenticated ? (
               <>
                 <button
-                  onClick={() => { setOpen(false); navigate('/signin'); }}
+                  onClick={() => { setOpen(false); openAuthModal('signin'); }}
                   className="w-full px-4 py-2 rounded-xl text-white border border-white/30 hover:bg-white/10 transition"
+                  style={{ color: '#fff' }}
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => { setOpen(false); openAuthModal('signup'); }}
+                  className="w-full px-4 py-2 rounded-xl text-white font-semibold 
+                    bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
+                  style={{ color: '#fff' }}
+                >
+                  Sign Up
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => { setOpen(false); logout(); }}
+                className="w-full px-4 py-2 rounded-xl font-semibold bg-red-600 text-white shadow-md hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
                   style={{ color: '#fff' }}
                 >
                   Sign In
