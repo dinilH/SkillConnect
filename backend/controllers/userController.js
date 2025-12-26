@@ -22,3 +22,36 @@ exports.getUserById = async (req, res) => {
     res.json({ success: false, message: "Server error" });
   }
 };
+
+// Search users by name or username
+exports.searchUsers = async (req, res) => {
+  try {
+    const { query, excludeId } = req.query;
+    
+    if (!query || query.trim().length === 0) {
+      return res.json({ success: true, users: [] });
+    }
+
+    const searchRegex = new RegExp(query.trim(), 'i');
+
+    const searchQuery = {
+      $or: [
+        { firstName: searchRegex },
+        { lastName: searchRegex },
+        { username: searchRegex }
+      ]
+    };
+
+    if (excludeId) {
+      searchQuery._id = { $ne: excludeId };
+    }
+
+    const users = await User.find(searchQuery, "firstName lastName email _id role department username")
+      .limit(10);
+
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error("Search Users Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};

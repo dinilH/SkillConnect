@@ -24,9 +24,12 @@ function LoginPageV2() {
             const data = await res.json();
 
             if (res.ok && data.success) {
+                // Store user and token in localStorage for ChatContext and auth
+                localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("token", data.token);
                 setTimeout(() => {
                     setIsLoading(false);
-                    navigate("/home");
+                    navigate("/");
                 }, 800);
             } else {
                 setIsLoading(false);

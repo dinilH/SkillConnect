@@ -1,15 +1,26 @@
 import React from 'react'
-import { FaComments } from 'react-icons/fa'
-import { useNavigate } from 'react-router-dom'
+import { FaComments, FaArrowLeft } from 'react-icons/fa'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 export default function FloatingChatButton() {
   const navigate = useNavigate()
+  const location = useLocation()
+  
+  const isOnChatPage = location.pathname === '/chat'
+
+  const handleClick = () => {
+    if (isOnChatPage) {
+      navigate(-1) // previous page
+    } else {
+      navigate('/chat')
+    }
+  }
 
   return (
     <button
-      aria-label="Open chat"
-      title="Chat"
-      onClick={() => navigate('/chat')}
+      aria-label={isOnChatPage ? "Go back" : "Open chat"}
+      title={isOnChatPage ? "Go back" : "Chat"}
+      onClick={handleClick}
       className={
         `fixed right-6 bottom-6 z-50 flex items-center justify-center
          w-14 h-14 rounded-full shadow-lg
@@ -19,7 +30,7 @@ export default function FloatingChatButton() {
          focus:outline-none focus:ring-4 focus:ring-[#7D4DF4]/30`
       }
     >
-      <FaComments aria-hidden="true" />
+      {isOnChatPage ? <FaArrowLeft aria-hidden="true" /> : <FaComments aria-hidden="true" />}
     </button>
   )
 }
