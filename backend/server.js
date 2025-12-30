@@ -1,8 +1,10 @@
+// backend/server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
 require("dotenv").config();
 
 // Routers
@@ -10,26 +12,43 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
 const messageRoutes = require("./routes/messageRoutes");
-const requestRoutes = require("./routes/requestRoutes");
-const applyToHelproutes = require("./routes/applyToHelpRoutes");
-
+const profileRoutes = require("./routes/profileRoutes");
+const postRoutes = require("./routes/postRoutes");
 
 const app = express();
 const server = http.createServer(app);
 
-// Allowed client origin (for CORS and Socket.IO)
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+// Allowed client origins
+const CLIENT_URLS = [
+    "http://localhost:5173",
+    "http://localhost:5176",
+];
 
-// Socket.IO setup
+// Socket.IO
 const io = new Server(server, {
-    cors: { origin: CLIENT_URL, methods: ["GET", "POST"], credentials: true },
+    cors: {
+        origin: CLIENT_URLS,
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
 });
+
 app.set("io", io);
 
+// Middleware
 app.use(express.json());
-app.use(cors({ origin: CLIENT_URL, methods: ["GET", "POST"], credentials: true }));
+app.use(
+    cors({
+        origin: CLIENT_URLS,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+    })
+);
 
-// mount routes under /api
+// Static uploads (profile image, cover image, post images)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Routes
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", conversationRoutes);
@@ -38,7 +57,7 @@ app.use("/api", requestRoutes);
 app.use("/api", applyToHelproutes);
 
 
-// ENVIRONMENT VARIABLES
+// Env
 const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -52,7 +71,7 @@ if (!JWT_SECRET) {
     process.exit(1);
 }
 
-// MongoDB CONNECTION
+// MongoDB
 mongoose
     .connect(MONGO_URL, { serverSelectionTimeoutMS: 10000, socketTimeoutMS: 45000, maxPoolSize: 10 })
     .then(() => console.log("MongoDB Connected"))
@@ -63,8 +82,9 @@ mongoose
         );
     });
 
-// SOCKET.IO CONNECTION HANDLING
+// Socket handlers
 const onlineUsers = new Map();
+
 io.on("connection", (socket) => {
     socket.on("user_online", (userId) => {
         onlineUsers.set(userId, socket.id);
@@ -74,19 +94,20 @@ io.on("connection", (socket) => {
         socket.join(conversationId);
     });
 
-    socket.on("leave_conversation", (conversationId) => {
-        socket.leave(conversationId);
-    });
+    socket.on("join_conversation", (id) => socket.join(id));
+    socket.on("leave_conversation", (id) => socket.leave(id));
 
     socket.on("disconnect", () => {
-        for (const [userId, socketId] of onlineUsers.entries()) {
-            if (socketId === socket.id) {
-                onlineUsers.delete(userId);
+        for (const [u, s] of onlineUsers.entries()) {
+            if (s === socket.id) {
+                onlineUsers.delete(u);
                 break;
             }
         }
     });
 });
 
-// START SERVER
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start
+server.listen(PORT, () =>
+    console.log(`🚀 Server running on port ${PORT}`)
+);

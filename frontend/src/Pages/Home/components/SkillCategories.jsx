@@ -10,17 +10,17 @@ export default function SkillCategories() {
   ];
 
   return (
-    <div className="w-full flex justify-center py-10">
-      <div className="w-full max-w-5xl bg-white shadow-md rounded-2xl p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Skill Categories</h2>
-        <div className="flex flex-wrap gap-4">
+    <div className="w-full flex justify-center py-8">
+      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-lg border border-purple-200 p-6 hover:shadow-purple-300/40 transition">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Skill Categories</h2>
+        <div className="flex flex-wrap gap-3">
           {categories.map((skill, index) => (
-            <div
+            <span
               key={index}
-              className="px-6 py-3 bg-gray-100 border rounded-xl shadow-sm text-gray-700 font-medium hover:shadow transition duration-200 cursor-pointer"
+              className="px-4 py-2 text-sm font-semibold rounded-xl text-purple-700 border border-purple-500 shadow-md bg-white hover:bg-purple-50 transition cursor-pointer"
             >
               {skill}
-            </div>
+            </span>
           ))}
         </div>
       </div>

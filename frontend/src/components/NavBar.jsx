@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext.jsx";
+import { useModal } from "../ModalContext.jsx";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
@@ -8,6 +10,8 @@ export default function NavBar() {
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
+  const { isAuthenticated, user, logout } = useAuth();
+  const { openAuthModal } = useModal();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,27 +81,45 @@ export default function NavBar() {
 
       {/* Right: Profile + Auth Buttons */}
       <div className="flex items-center gap-3">
-        <FaUserCircle onClick={() => navigate('/profile')} className="text-white text-2xl cursor-pointer hover:text-[#A589FD] transition" />
+        {isAuthenticated && (
+          <button
+            onClick={() => navigate('/profile')}
+            className="flex items-center gap-2 text-white hover:text-[#A589FD] transition"
+          >
+            <FaUserCircle className="text-2xl" />
+            <span className="hidden sm:inline">{user?.name || 'Profile'}</span>
+          </button>
+        )}
 
-        <button
-          onClick={() => navigate('/signin')}
-          className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
-          bg-linear-to-r from-[#27229f] to-[#7D4DF4] shadow-md shadow-[#7D4DF4]/40 
-          hover:opacity-80 transition"
-          style={{ color: '#fff' }}
-        >
-          Sign In
-        </button>
-
-        <button
-          onClick={() => navigate('/signup')}
-          className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
-          bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 
-          hover:opacity-90 transition"
-          style={{ color: '#fff' }}
-        >
-          Sign Up
-        </button>
+        {!isAuthenticated ? (
+          <>
+            <button
+              onClick={() => openAuthModal('signin')}
+              className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
+              bg-linear-to-r from-[#27229f] to-[#7D4DF4] shadow-md shadow-[#7D4DF4]/40 
+              hover:opacity-80 transition"
+              style={{ color: '#fff' }}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => openAuthModal('signup')}
+              className="hidden sm:inline-block px-4 py-1 rounded-xl text-white font-semibold 
+              bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 
+              hover:opacity-90 transition"
+              style={{ color: '#fff' }}
+            >
+              Sign Up
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={logout}
+            className="px-4 py-1 rounded-xl font-semibold bg-red-600 text-white shadow-md hover:bg-red-700 transition"
+          >
+            Logout
+          </button>
+        )}
 
         {/* Mobile menu toggle */}
         <button
@@ -132,21 +154,32 @@ export default function NavBar() {
           ))}
 
           <div className="flex flex-col sm:flex-row gap-2 mt-2 px-2">
-            <button
-              onClick={() => { setOpen(false); navigate('/signin'); }}
-              className="w-full px-4 py-2 rounded-xl text-white border border-white/30 hover:bg-white/10 transition"
-              style={{ color: '#fff' }}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => { setOpen(false); navigate('/signup'); }}
-              className="w-full px-4 py-2 rounded-xl text-white font-semibold 
-                bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
-              style={{ color: '#fff' }}
-            >
-              Sign Up
-            </button>
+            {!isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => { setOpen(false); openAuthModal('signin'); }}
+                  className="w-full px-4 py-2 rounded-xl text-white border border-white/30 hover:bg-white/10 transition"
+                  style={{ color: '#fff' }}
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => { setOpen(false); openAuthModal('signup'); }}
+                  className="w-full px-4 py-2 rounded-xl text-white font-semibold 
+                    bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition"
+                  style={{ color: '#fff' }}
+                >
+                  Sign Up
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => { setOpen(false); logout(); }}
+                className="w-full px-4 py-2 rounded-xl font-semibold bg-red-600 text-white shadow-md hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>

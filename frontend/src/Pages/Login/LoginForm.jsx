@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import logoImage from "../../assets/skilllogo.png";
+import { useAuth } from "../../AuthContext.jsx";
 
 function LoginPageV2() {
     const [email, setEmail] = useState("");
@@ -9,12 +10,16 @@ function LoginPageV2() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+
         try {
-            const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+            const apiBase =
+                import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
             const res = await fetch(`${apiBase}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -23,29 +28,30 @@ function LoginPageV2() {
 
             const data = await res.json();
 
-            if (res.ok && data.success) {
-                // Store user and token in localStorage for ChatContext and auth
-                localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("token", data.token);
+            if (res.ok && data.success && data.token && data.user) {
+                // persist auth and redirect
+                login(data.token, data.user);
                 setTimeout(() => {
                     setIsLoading(false);
                     navigate("/");
-                }, 800);
+                }, 500);
             } else {
                 setIsLoading(false);
-                alert("Invalid credentials");
+                alert(data.message || "Invalid credentials");
             }
         } catch (err) {
             setIsLoading(false);
             alert("Network error");
+            console.error(err);
         }
     };
+
 
     return (
         <>
             {/* Animated Gradient Background */}
             <div className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#7D4DF4]/20 via-black to-[#A589FD]/20" />
+                <div className="absolute inset-0 bg-linear-to-br from-[#7D4DF4]/20 via-black to-[#A589FD]/20" />
 
                 {/* Floating Particles */}
                 {[...Array(6)].map((_, i) => (
@@ -92,14 +98,14 @@ function LoginPageV2() {
                         }}
                     >
                         {/* Glow Border Effect */}
-                        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] opacity-30 blur-xl -z-10 animate-pulse" />
+                        <div className="absolute inset-0 rounded-3xl bg-linear-to-r from-[#7D4DF4] to-[#A589FD] opacity-30 blur-xl -z-10 animate-pulse" />
 
                         <div className="text-center mb-10">
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                                className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-[#7D4DF4] to-[#A589FD] p-1 shadow-xl"
+                                className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-linear-to-br from-[#7D4DF4] to-[#A589FD] p-1 shadow-xl"
                             >
                                 <img
                                     src={logoImage}
@@ -168,7 +174,7 @@ function LoginPageV2() {
                                 whileTap={{ scale: 0.98 }}
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] shadow-lg hover:shadow-[#7D4DF4]/50 transition-all duration-300 relative overflow-hidden group"
+                                className="w-full py-4 rounded-2xl font-bold text-white bg-linear-to-r from-[#7D4DF4] to-[#A589FD] shadow-lg hover:shadow-[#7D4DF4]/50 transition-all duration-300 relative overflow-hidden group"
                             >
                 <span className={`flex items-center justify-center gap-3 ${isLoading ? "opacity-70" : ""}`}>
                   {isLoading && (
@@ -180,7 +186,7 @@ function LoginPageV2() {
                   )}
                     {isLoading ? "Signing in..." : "Log In"}
                 </span>
-                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                             </motion.button>
                         </form>
 

@@ -119,19 +119,19 @@ export default function CommunityPage() {
 
   return (<>
     <NavBar />
-    <div className=" bg-gradient-to-br from-[#F3E8FF] to-white w-5xl shadow-xl rounded-3xl mt-15 h-[80vh] mt-20">
-      <div className="max-w-6xl mx-auto p-6">
+    <div className="min-h-screen bg-linear-to-br from-[#F3E8FF] to-white w-full">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Title */}
         <h1 className="text-2xl font-semibold mb-6 text-slate-900">Community</h1>
 
         {/* Tabs + New Button */}
         <div className="flex items-center justify-between mb-6">
-        <div className="flex bg-white border rounded-lg overflow-hidden shadow-sm">
+        <div className="flex bg-white border border-purple-200 rounded-2xl overflow-hidden shadow-sm">
           {tabs.map((t) => (
             <button
               key={t}
               onClick={() => setActiveTab(t)}
-              className={`px-6 py-2 text-sm ${activeTab === t ? "bg-gray-100 font-semibold" : "text-gray-600"}`}>
+              className={`px-6 py-2 text-sm ${activeTab === t ? "bg-purple-50 text-purple-700 font-semibold" : "text-gray-600 hover:text-purple-700"}`}>
               {t}
             </button>
           ))}
@@ -140,7 +140,7 @@ export default function CommunityPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={openModal}
-            className="bg-gray-900 text-white px-4 py-2 rounded shadow hover:bg-black"
+            className="px-4 py-2 rounded-xl bg-linear-to-r from-[#7D4DF4] to-[#A589FD] text-white shadow hover:opacity-90 transition"
           >
             New Discussion
           </button>
@@ -155,12 +155,12 @@ export default function CommunityPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search discussions, authors, or content..."
-              className="w-full border-2 border-purple-300 rounded-md px-4 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full border-2 border-purple-300 rounded-xl px-4 py-3 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-purple-600 hover:text-purple-800 transition-colors font-medium"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-purple-700 hover:text-purple-900 transition-colors font-medium"
               >
                 Clear
               </button>
@@ -173,7 +173,7 @@ export default function CommunityPage() {
               <button
                 key={tag}
                 onClick={() => toggleTag(tag)}
-                className={`text-sm px-3 py-1 rounded-full border transition-all ${selectedTags.includes(tag) ? "bg-purple-600 text-white border-purple-600" : "bg-white text-purple-700 border-purple-300 hover:border-purple-500"}`}>
+                className={`text-sm px-3 py-1 rounded-full border transition-all shadow-sm ${selectedTags.includes(tag) ? "bg-purple-600 text-white border-purple-600" : "bg-white text-purple-700 border-purple-300 hover:border-purple-500"}`}>
                 #{tag}
               </button>
             ))}
@@ -185,7 +185,7 @@ export default function CommunityPage() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border-2 border-purple-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
           >
             <option>All</option>
             <option>Academics</option>
@@ -197,7 +197,7 @@ export default function CommunityPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="border-2 border-purple-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
           >
             <option value="recent">Sort: Recent</option>
             <option value="views">Sort: Most views</option>
@@ -209,18 +209,18 @@ export default function CommunityPage() {
       {/* Discussion list */}
       <div className="space-y-4">
         {visible.map((d) => (
-          <div key={d.id} className="bg-white border rounded-lg shadow-sm p-4 flex gap-4">
-            <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-sm">IMG</div>
+          <div key={d.id} className="bg-white rounded-3xl shadow-lg border border-purple-200 p-6 flex gap-6 hover:shadow-purple-300/40 transition">
+            <div className="w-16 h-16 rounded-xl bg-linear-to-br from-[#6C38FF] via-[#4C2AFF] to-[#EC38F5] flex items-center justify-center text-white text-xs font-bold shadow">IMG</div>
 
             <div className="flex-1">
-              <h3 className="text-lg font-medium">{d.title}</h3>
+              <h3 className="text-lg font-bold text-gray-900">{d.title}</h3>
 
               <div className="flex items-center gap-3 text-xs text-gray-500 mt-2 flex-wrap">
                 <span>by {d.author}</span>
                 <span className="w-px h-4 bg-gray-300" />
-                <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-700">{d.category}</span>
+                <span className="px-2 py-0.5 bg-purple-50 rounded-xl text-purple-700 border border-purple-300">{d.category}</span>
                 {d.tags.map((t) => (
-                  <span key={t} className="ml-2 text-xs text-gray-500">#{t}</span>
+                  <span key={t} className="ml-2 text-xs text-purple-700 border border-purple-300 px-2 py-0.5 rounded-xl">#{t}</span>
                 ))}
                 <span className="text-gray-400">• Last activity: {d.lastActivity}</span>
               </div>
@@ -234,7 +234,7 @@ export default function CommunityPage() {
         ))}
 
         {visible.length === 0 && (
-          <div className="text-center text-gray-500 py-10 bg-white border rounded">No discussions match your filters.</div>
+          <div className="text-center text-gray-500 py-10 bg-white rounded-3xl border border-purple-200">No discussions match your filters.</div>
         )}
       </div>
       </div>
@@ -242,10 +242,10 @@ export default function CommunityPage() {
       {/* New Discussion Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-lg">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-purple-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">New Discussion</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-500">Close</button>
+              <h2 className="text-lg font-semibold text-gray-900">New Discussion</h2>
+              <button onClick={() => setIsModalOpen(false)} className="px-3 py-1 rounded-lg border border-purple-300 text-purple-700 hover:bg-purple-50 transition">Close</button>
             </div>
 
             <form onSubmit={submitForm} className="space-y-4">
@@ -254,7 +254,7 @@ export default function CommunityPage() {
                 <input
                   value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  className="w-full border-2 border-purple-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
                   required
                 />
               </div>
@@ -265,7 +265,7 @@ export default function CommunityPage() {
                   <input
                     value={form.author}
                     onChange={(e) => setForm((f) => ({ ...f, author: e.target.value }))}
-                    className="w-full border-2 border-purple-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
                   />
                 </div>
 
@@ -274,7 +274,7 @@ export default function CommunityPage() {
                   <input
                     value={form.category}
                     onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                    className="w-full border-2 border-purple-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
                   />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function CommunityPage() {
                       type="button"
                       key={t}
                       onClick={() => toggleFormTag(t)}
-                      className={`px-3 py-1 rounded-full text-sm border transition-all ${form.tags.includes(t) ? "bg-purple-600 text-white border-purple-600" : "bg-white text-purple-700 border-purple-300 hover:border-purple-500"}`}>
+                      className={`px-3 py-1 rounded-full text-sm border transition-all shadow-sm ${form.tags.includes(t) ? "bg-purple-600 text-white border-purple-600" : "bg-white text-purple-700 border-purple-300 hover:border-purple-500"}`}>
                       #{t}
                     </button>
                   ))}
@@ -299,13 +299,13 @@ export default function CommunityPage() {
                 <textarea
                   value={form.content}
                   onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-                  className="w-full border-2 border-purple-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent h-28"
+                  className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent h-28 shadow-sm"
                 />
               </div>
 
               <div className="flex items-center justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border rounded">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-gray-900 text-white rounded">Create</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-xl border border-purple-300 text-purple-700 hover:bg-purple-50 transition">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-xl bg-linear-to-r from-[#7D4DF4] to-[#A589FD] text-white shadow hover:opacity-90 transition">Create</button>
               </div>
             </form>
           </div>

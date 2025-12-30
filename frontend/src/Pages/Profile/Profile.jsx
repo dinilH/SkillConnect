@@ -48,7 +48,6 @@ export default function Profile() {
                   <span className="text-green-500">✓</span> Add feedback
                 </p>
               </div>
-
               <button
                 onClick={() => setViewType("owner")}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
