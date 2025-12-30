@@ -53,8 +53,9 @@ app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", conversationRoutes);
 app.use("/api", messageRoutes);
-app.use("/api/profile", profileRoutes);
-app.use("/api/posts", postRoutes);
+app.use("/api", requestRoutes);
+app.use("/api", applyToHelproutes);
+
 
 // Env
 const PORT = process.env.PORT || 5000;
