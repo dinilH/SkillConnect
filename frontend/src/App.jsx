@@ -23,10 +23,10 @@ function App() {
                 <Route path="/skill-request" element={<SkillRequest />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/chat" element={<MessagePage />} />
-                <Route path="/profile" element={<Profile />} />
+                {/*<Route path="/profile" element={<Profile />} />*/}
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/signin" element={<LoginPage />} />
-                <Route path="/profileown" element={<Profileown />} />
+                <Route path="/profile" element={<Profileown />} />
             </Routes>
 
             <FloatingChatButton />

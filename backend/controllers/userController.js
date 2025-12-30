@@ -55,3 +55,87 @@ exports.searchUsers = async (req, res) => {
     res.json({ success: false, message: "Server error" });
   }
 };
+
+// Update user GPA
+exports.updateGPA = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { gpa } = req.body;
+
+    if (gpa === undefined || gpa === null) {
+      return res.json({ success: false, message: "GPA is required" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { gpa: parseFloat(gpa) },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, message: "GPA updated successfully", gpa: user.gpa });
+  } catch (error) {
+    console.error("Update GPA Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Toggle endorsement for a user
+exports.toggleEndorsement = async (req, res) => {
+  try {
+    const { userId } = req.params; // User being endorsed
+    const { endorserId } = req.body; // User giving the endorsement
+
+    if (!endorserId) {
+      return res.json({ success: false, message: "Endorser ID is required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    const hasEndorsed = user.endorsedBy.includes(endorserId);
+
+    if (hasEndorsed) {
+      // Remove endorsement
+      user.endorsedBy = user.endorsedBy.filter(id => id.toString() !== endorserId);
+      user.endorsements = Math.max(0, user.endorsements - 1);
+    } else {
+      // Add endorsement
+      user.endorsedBy.push(endorserId);
+      user.endorsements += 1;
+    }
+
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      endorsed: !hasEndorsed,
+      endorsements: user.endorsements 
+    });
+  } catch (error) {
+    console.error("Toggle Endorsement Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Get popular members based on endorsements
+exports.getPopularMembers = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+
+    const users = await User.find({})
+      .select("firstName lastName username profileImage skills endorsements gpa")
+      .sort({ endorsements: -1 })
+      .limit(limit);
+
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error("Get Popular Members Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};

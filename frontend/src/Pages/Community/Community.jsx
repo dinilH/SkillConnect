@@ -1,47 +1,14 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import NavBar from "../../components/NavBar";
+import { useAuth } from "../../AuthContext";
 
 export default function CommunityPage() {
+  const { user, isAuthenticated } = useAuth();
   const tabs = ["Discussions", "Mentorship", "Events", "Groups"];
   const [activeTab, setActiveTab] = useState("Discussions");
-
-  const initialData = [
-    {
-      id: 1,
-      title: "Best practices for learning React in 2024?",
-      author: "Alex Chen",
-      replies: 23,
-      views: 145,
-      category: "Coding",
-      tags: ["React", "Learning", "BestPractices"],
-      lastActivity: "5m ago",
-      content: "What are the best resources and routine to learn React effectively?",
-    },
-    {
-      id: 2,
-      title: "Looking for study group - Data Structures",
-      author: "Sarah Johnson",
-      replies: 12,
-      views: 89,
-      category: "Academics",
-      tags: ["DSA", "StudyGroup"],
-      lastActivity: "1h ago",
-      content: "Forming a study group to prepare for upcoming exams.",
-    },
-  ];
-
-  const allTags = [
-    "React",
-    "JavaScript",
-    "DSA",
-    "WebDev",
-    "Career",
-    "StudyGroup",
-    "BestPractices",
-    "Learning",
-  ];
-
-  const [discussions, setDiscussions] = useState(initialData);
+  const [discussions, setDiscussions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [allTags, setAllTags] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedTags, setSelectedTags] = useState([]);
@@ -51,11 +18,50 @@ export default function CommunityPage() {
   // new discussion form state
   const [form, setForm] = useState({
     title: "",
-    author: "",
     category: "",
     tags: [],
     content: "",
   });
+
+  // Fetch discussions from backend
+  useEffect(() => {
+    fetchDiscussions();
+    fetchPopularTags();
+  }, [selectedCategory, selectedTags, sortBy]);
+
+  const fetchDiscussions = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedCategory !== "All") params.append("category", selectedCategory);
+      if (selectedTags.length > 0) params.append("tags", selectedTags.join(","));
+      if (sortBy) params.append("sortBy", sortBy);
+
+      const response = await fetch(`http://localhost:5000/api/discussions?${params}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setDiscussions(data.discussions);
+      }
+    } catch (error) {
+      console.error("Error fetching discussions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPopularTags = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/discussions/tags?limit=10");
+      const data = await response.json();
+      
+      if (data.success) {
+        setAllTags(data.tags.map(t => t.tag));
+      }
+    } catch (error) {
+      console.error("Error fetching tags:", error);
+    }
+  };
 
   function toggleTag(tag) {
     setSelectedTags((prev) =>
@@ -73,49 +79,88 @@ export default function CommunityPage() {
   function filteredDiscussions() {
     return discussions
       .filter((d) => {
-        if (selectedCategory !== "All" && d.category !== selectedCategory) return false;
-        if (selectedTags.length > 0 && !selectedTags.every((t) => d.tags.includes(t))) return false;
         if (search.trim() !== "") {
           const s = search.toLowerCase();
           return (
             d.title.toLowerCase().includes(s) ||
-            d.author.toLowerCase().includes(s) ||
-            d.content.toLowerCase().includes(s)
+            d.content.toLowerCase().includes(s) ||
+            (d.author?.firstName + " " + d.author?.lastName).toLowerCase().includes(s)
           );
         }
         return true;
-      })
-      .sort((a, b) => {
-        if (sortBy === "recent") return b.id - a.id; // crude recent by id
-        if (sortBy === "views") return b.views - a.views;
-        if (sortBy === "replies") return b.replies - a.replies;
-        return 0;
       });
   }
 
-  const visible = useMemo(filteredDiscussions, [discussions, search, selectedCategory, selectedTags, sortBy]);
+  const visible = useMemo(filteredDiscussions, [discussions, search]);
 
   function openModal() {
-    setForm({ title: "", author: "", category: "", tags: [], content: "" });
+    if (!isAuthenticated) {
+      alert("Please login to create a discussion");
+      return;
+    }
+    setForm({ title: "", category: "", tags: [], content: "" });
     setIsModalOpen(true);
   }
 
-  function submitForm(e) {
+  async function submitForm(e) {
     e.preventDefault();
-    const newItem = {
-      id: Date.now(),
-      title: form.title || "Untitled",
-      author: form.author || "Anonymous",
-      replies: 0,
-      views: 0,
-      category: form.category || "General",
-      tags: form.tags,
-      lastActivity: "just now",
-      content: form.content || "",
-    };
-    setDiscussions((d) => [newItem, ...d]);
-    setIsModalOpen(false);
+    
+    if (!isAuthenticated || !user) {
+      alert("Please login to create a discussion");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/discussions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          title: form.title,
+          category: form.category || "General",
+          tags: form.tags,
+          content: form.content,
+          authorId: user.id || user.userId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setDiscussions([data.discussion, ...discussions]);
+        setIsModalOpen(false);
+        setForm({ title: "", category: "", tags: [], content: "" });
+      } else {
+        alert("Failed to create discussion: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error creating discussion:", error);
+      alert("Failed to create discussion");
+    }
   }
+
+  const getTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + "y ago";
+    
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + "mo ago";
+    
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + "d ago";
+    
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + "h ago";
+    
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + "m ago";
+    
+    return Math.floor(seconds) + "s ago";
+  };
 
   return (<>
     <NavBar />
@@ -208,33 +253,42 @@ export default function CommunityPage() {
 
       {/* Discussion list */}
       <div className="space-y-4">
-        {visible.map((d) => (
-          <div key={d.id} className="bg-white rounded-3xl shadow-lg border border-purple-200 p-6 flex gap-6 hover:shadow-purple-300/40 transition">
-            <div className="w-16 h-16 rounded-xl bg-linear-to-br from-[#6C38FF] via-[#4C2AFF] to-[#EC38F5] flex items-center justify-center text-white text-xs font-bold shadow">IMG</div>
-
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-gray-900">{d.title}</h3>
-
-              <div className="flex items-center gap-3 text-xs text-gray-500 mt-2 flex-wrap">
-                <span>by {d.author}</span>
-                <span className="w-px h-4 bg-gray-300" />
-                <span className="px-2 py-0.5 bg-purple-50 rounded-xl text-purple-700 border border-purple-300">{d.category}</span>
-                {d.tags.map((t) => (
-                  <span key={t} className="ml-2 text-xs text-purple-700 border border-purple-300 px-2 py-0.5 rounded-xl">#{t}</span>
-                ))}
-                <span className="text-gray-400">• Last activity: {d.lastActivity}</span>
+        {loading ? (
+          <div className="text-center text-gray-500 py-10 bg-white rounded-3xl border border-purple-200">
+            Loading discussions...
+          </div>
+        ) : visible.length === 0 ? (
+          <div className="text-center text-gray-500 py-10 bg-white rounded-3xl border border-purple-200">
+            No discussions found. Be the first to start one!
+          </div>
+        ) : (
+          visible.map((d) => (
+            <div key={d._id} className="bg-white rounded-3xl shadow-lg border border-purple-200 p-6 flex gap-6 hover:shadow-purple-300/40 transition">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#6C38FF] via-[#4C2AFF] to-[#EC38F5] flex items-center justify-center text-white text-xs font-bold shadow">
+                {d.author?.firstName?.[0]}{d.author?.lastName?.[0]}
               </div>
 
-              <div className="flex gap-8 mt-3 text-sm text-gray-700">
-                <span><strong>{d.replies}</strong> replies</span>
-                <span><strong>{d.views}</strong> views</span>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900">{d.title}</h3>
+
+                <div className="flex items-center gap-3 text-xs text-gray-500 mt-2 flex-wrap">
+                  <span>by {d.author?.firstName} {d.author?.lastName}</span>
+                  <span className="w-px h-4 bg-gray-300" />
+                  <span className="px-2 py-0.5 bg-purple-50 rounded-xl text-purple-700 border border-purple-300">{d.category}</span>
+                  {d.tags?.map((t) => (
+                    <span key={t} className="ml-2 text-xs text-purple-700 border border-purple-300 px-2 py-0.5 rounded-xl">#{t}</span>
+                  ))}
+                  <span className="text-gray-400">• {getTimeAgo(d.createdAt)}</span>
+                </div>
+
+                <div className="flex gap-8 mt-3 text-sm text-gray-700">
+                  <span><strong>{d.replies?.length || 0}</strong> replies</span>
+                  <span><strong>{d.views || 0}</strong> views</span>
+                  <span><strong>{d.likes || 0}</strong> likes</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-        {visible.length === 0 && (
-          <div className="text-center text-gray-500 py-10 bg-white rounded-3xl border border-purple-200">No discussions match your filters.</div>
+          ))
         )}
       </div>
       </div>
@@ -259,24 +313,22 @@ export default function CommunityPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-600">Author</label>
-                  <input
-                    value={form.author}
-                    onChange={(e) => setForm((f) => ({ ...f, author: e.target.value }))}
-                    className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-gray-600">Category</label>
-                  <input
-                    value={form.category}
-                    onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-                    className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm text-gray-600">Category</label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                  className="w-full border-2 border-purple-300 rounded-xl px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="Academics">Academics</option>
+                  <option value="Coding">Coding</option>
+                  <option value="Events">Events</option>
+                  <option value="General">General</option>
+                  <option value="Career">Career</option>
+                  <option value="Mentorship">Mentorship</option>
+                </select>
               </div>
 
               <div>

@@ -1,4 +1,3 @@
-//frontend/src/Pages/Profile/ProfileOwnerView.jsx
 import { useState, useEffect } from "react";
 
 
@@ -34,9 +33,19 @@ export default function ProfileOwnerView() {
   const [posts, setPosts] = useState([]);
 
   const userId = localStorage.getItem("userId");
-  const API = axios.create({
-    baseURL: "http://localhost:5000/api",
-  });
+  const token = localStorage.getItem("token");
+  
+  // Create API instance function to ensure fresh token
+  const getAPI = () => {
+    const currentToken = localStorage.getItem("token");
+    return axios.create({
+      baseURL: "http://localhost:5000/api",
+      headers: {
+        Authorization: `Bearer ${currentToken}`,
+      },
+    });
+  };
+  
   const [portfolioLinks, setPortfolioLinks] = useState([
     { id: 1, title: "GitHub", url: "github.com/alex", icon: <Github className="w-5 h-5" /> },
     { id: 2, title: "LinkedIn", url: "linkedin.com/in/alex", icon: <Linkedin className="w-5 h-5" /> },
@@ -64,18 +73,17 @@ export default function ProfileOwnerView() {
 
   const [profileData, setProfileData] = useState({
     coverImage: "from-blue-600 to-cyan-500",
-    profileImage: "/user-profile-illustration.png", // Replace with your actual image path
-    name: "name",
-    pronouns: "empty",
-    position: "empty | empty",
-    university: "empty",
-    description:
-        "Passionate product manager with expertise in digital transformation. Creative problem solver committed to user-centric design and innovation.",
-    skills: [
-      { id: 1, title: "Web App Dev", sub: "(React/Next.js)", rating: 4 },
-      { id: 2, title: "Mobile Dev", sub: "(Kotlin/Swift)", rating: 3 },
-      { id: 3, title: "Backend", sub: "(Python/Django)", rating: 3 },
-    ],
+    profileImage: "/user-profile-illustration.png",
+    name: "Loading...",
+    pronouns: "",
+    position: "",
+    university: "",
+    description: "",
+    skills: [],
+    role: "",
+    department: "",
+    email: "",
+    username: "",
   })
 
   // We keep a separate state for the form so we can cancel edits without saving
@@ -87,12 +95,16 @@ export default function ProfileOwnerView() {
     if (!newPostContent.trim()) return;
 
     try {
-      const res = await API.post("/posts", {
+      const res = await getAPI().post("/posts", {
         userId,
         content: newPostContent,
       });
 
-      setPosts([res.data, ...posts]);
+      const createdPost = res?.data?.post ?? res?.data ?? null;
+      setPosts((prev) => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        return createdPost ? [createdPost, ...safePrev] : safePrev;
+      });
       setNewPostContent("");
       setShowPostModal(false);
     } catch (err) {
@@ -111,9 +123,7 @@ export default function ProfileOwnerView() {
       const [firstName, ...rest] = editFormData.name.split(" ");
       const lastName = rest.join(" ");
 
-      await API.put(`/profile/${userId}`, {
-        firstName,
-        lastName,
+      await getAPI().put(`/profile/${userId}`, {
         pronouns: editFormData.pronouns,
         headline: editFormData.position,
         university: editFormData.university,
@@ -121,12 +131,17 @@ export default function ProfileOwnerView() {
         skills: editFormData.skills,
         profileImage: editFormData.profileImage,
         coverImage: editFormData.coverImage,
+        portfolioLinks: portfolioLinks.map(link => ({
+          title: link.title,
+          url: link.url
+        })),
       });
 
-      setProfileData(editFormData);
+      setProfileData({...editFormData, role: profileData.role, department: profileData.department});
       setShowEditModal(false);
     } catch (err) {
       console.error("Profile update error", err);
+      alert("Failed to save profile changes.");
     }
   };
 
@@ -149,11 +164,17 @@ export default function ProfileOwnerView() {
 
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !token) {
+      console.log("Missing userId or token:", { userId, token });
+      return;
+    }
+
+    console.log("Loading profile for userId:", userId);
 
     // Load profile
-    API.get(`/profile/${userId}`)
+    getAPI().get(`/profile/${userId}`)
         .then(res => {
+          console.log("Profile loaded:", res.data);
           const user = res.data;
 
           setProfileData({
@@ -161,10 +182,14 @@ export default function ProfileOwnerView() {
             profileImage: user.profileImage || "/placeholder.svg",
             name: `${user.firstName} ${user.lastName}`,
             pronouns: user.pronouns || "",
-            position: user.headline || "",
+            position: user.headline || `${user.role} | ${user.department}`,
             university: user.university || "",
             description: user.about || "",
             skills: user.skills || [],
+            role: user.role || "",
+            department: user.department || "",
+            email: user.email || "",
+            username: user.username || "",
           });
 
           setEditFormData({
@@ -172,23 +197,52 @@ export default function ProfileOwnerView() {
             profileImage: user.profileImage || "",
             name: `${user.firstName} ${user.lastName}`,
             pronouns: user.pronouns || "",
-            position: user.headline || "",
+            position: user.headline || `${user.role} | ${user.department}`,
             university: user.university || "",
             description: user.about || "",
             skills: user.skills || [],
+            role: user.role || "",
+            department: user.department || "",
           });
+
+          // Load portfolio links if available
+          if (user.portfolioLinks && user.portfolioLinks.length > 0) {
+            setPortfolioLinks(user.portfolioLinks.map((link, idx) => ({
+              id: idx + 1,
+              title: link.title,
+              url: link.url,
+              icon: <Globe className="w-5 h-5" />
+            })));
+          }
+        })
+        .catch(err => {
+          console.error("Profile load error:", err);
+          console.error("Error response:", err.response);
+          alert("Failed to load profile. Please try logging in again.");
         });
 
     // Load posts
-    API.get(`/posts/${userId}`)
-        .then(res => setPosts(res.data));
+    getAPI().get(`/posts/user/${userId}`)
+        .then(res => {
+          console.log("Posts loaded:", res.data);
+          const data = res?.data;
+          const normalized = Array.isArray(data)
+              ? data
+              : Array.isArray(data?.posts)
+                ? data.posts
+                : Array.isArray(data?.data)
+                  ? data.data
+                  : [];
+          setPosts(normalized);
+        })
+        .catch(err => console.error("Posts load error:", err));
 
-  }, [userId]);
+  }, [userId, token]);
 
 
   return (
 
-      <div className="min-h-screen bg-[#FFFFFF] font-sans text-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-white font-sans text-gray-900">
         <NavBar />
         <main className="max-w-7xl mx-auto px-0 sm:px-4 py-6 pt-28">
 
@@ -199,7 +253,7 @@ export default function ProfileOwnerView() {
             <div className="flex-1 min-w-0">
 
               {/* --- Profile Card --- */}
-              <div className="bg-white sm:rounded-xl shadow-[0_0_20px_#A589FD] overflow-hidden mb-4 relative">
+              <div className="bg-white sm:rounded-2xl shadow-xl border border-purple-100 overflow-hidden mb-4 relative">
 
 
               {/* Cover Image */}
@@ -448,7 +502,7 @@ export default function ProfileOwnerView() {
 
               {/* --- Feed Posts --- */}
               <div className="space-y-4 ">
-                {posts.map((post) => (
+                {(Array.isArray(posts) ? posts : []).map((post) => (
                     <PostCard
                         key={post._id || post.id}
                         name={
@@ -1133,7 +1187,7 @@ function SimilarProfile({ name, role, avgRating }) {
             </div>
           </div>
           <p className="text-xs text-gray-500 truncate">{role}</p>
-          <button className="mt-1 text-xs bg-linear-to-r text-white font-semibold from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition-colors rounded-full px-3 py-1 hover:border-black hover:text-gray-700 transition-colors">
+          <button className="mt-1 text-xs bg-linear-to-r text-white font-semibold from-[#7D4DF4] to-[#A589FD] shadow-md shadow-[#7D4DF4]/40 hover:opacity-90 transition-colors rounded-full px-3 py-1 hover:border-black hover:text-gray-700">
             View Profile
           </button>
         </div>

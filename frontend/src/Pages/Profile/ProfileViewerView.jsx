@@ -51,7 +51,7 @@ export default function ProfileViewerView() {
   }
 
   return (
-      <div className="min-h-screen bg-[#FFFFFF] font-sans text-gray-800">
+      <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-white font-sans text-gray-800">
 
         <NavBar />
 
@@ -64,7 +64,7 @@ export default function ProfileViewerView() {
           {/* ================= LEFT COLUMN ================= */}
             <div className="flex-1 min-w-0">
               {/* --- Profile Card --- */}
-              <div className="bg-white sm:rounded-xl shadow-[0_0_20px_#A589FD] overflow-hidden mb-4 relative">
+              <div className="bg-white sm:rounded-2xl shadow-xl border border-purple-100 overflow-hidden mb-4 relative">
                 {/* Cover Image */}
                 <div className="h-40 sm:h-48 bg-gradient-to-r from-slate-500 to-slate-700 relative"></div>
 

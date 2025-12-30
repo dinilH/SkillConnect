@@ -14,6 +14,7 @@ const conversationRoutes = require("./routes/conversationRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const postRoutes = require("./routes/postRoutes");
+const discussionRoutes = require("./routes/discussionRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -55,6 +56,7 @@ app.use("/api", conversationRoutes);
 app.use("/api", messageRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api", discussionRoutes);
 
 // Env
 const PORT = process.env.PORT || 5000;
