@@ -137,14 +137,10 @@ export default function ProfileViewerView() {
             <div className="px-4 sm:px-8 pb-8 relative">
               {/* Avatar and Message Button */}
               <div className="-mt-16 mb-4 flex justify-between items-end">
-                <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
-                  {profileImage ? (
-                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#6C38FF] to-[#EC38F5] flex items-center justify-center text-white text-3xl font-bold">
-                      {userData.firstName?.[0]}{userData.lastName?.[0]}
-                    </div>
-                  )}
+                <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-md">
+                  <div className="w-full h-full bg-gradient-to-br from-[#7D4DF4] to-[#A589FD] flex items-center justify-center text-white text-4xl font-bold">
+                    {userData.firstName?.[0]?.toUpperCase()}{userData.lastName?.[0]?.toUpperCase()}
+                  </div>
                 </div>
 
                 <div className="mb-2 hidden sm:block">
@@ -232,33 +228,6 @@ export default function ProfileViewerView() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* ================= COMMUNITY DISCUSSIONS ================= */}
-          <div className="bg-white rounded-2xl shadow-lg border border-purple-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Community Discussions</h2>
-            
-            {discussionsLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="animate-pulse border border-purple-100 rounded-xl p-4">
-                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                ))}
-              </div>
-            ) : discussions.length > 0 ? (
-              <div className="space-y-4">
-                {discussions.map((discussion) => (
-                  <DiscussionCard key={discussion._id} discussion={discussion} navigate={navigate} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">No discussions yet</p>
-              </div>
-            )}
           </div>
         </main>
         {chatOpen && <ChatDialog onClose={() => setChatOpen(false)} />}

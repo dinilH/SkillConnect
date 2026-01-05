@@ -126,7 +126,7 @@ export default function ProfileOwnerView() {
           profileImage: user.profileImage || "/placeholder.svg",
           name: `${user.firstName} ${user.lastName}`,
           pronouns: user.pronouns || "",
-          position: user.headline || `${user.role} | ${user.department}`,
+          position: user.headline || "student",
           university: user.university || "",
           course: user.course || "",
           specialization: user.specialization || "",
@@ -140,7 +140,7 @@ export default function ProfileOwnerView() {
           profileImage: user.profileImage || "",
           name: `${user.firstName} ${user.lastName}`,
           pronouns: user.pronouns || "",
-          position: user.headline || `${user.role} | ${user.department}`,
+          position: user.headline || "student",
           university: user.university || "",
           course: user.course || "",
           specialization: user.specialization || "",
@@ -182,7 +182,7 @@ export default function ProfileOwnerView() {
         <div className="bg-white rounded-2xl shadow-lg border border-purple-200 overflow-hidden mb-6">
           {/* Cover Image */}
           <div
-            className="h-40 sm:h-48 relative group rounded-b-xl overflow-hidden"
+            className="h-40 sm:h-48 relative rounded-b-xl overflow-hidden"
             style={
               profileData.coverImage?.startsWith("blob:")
                 ? { backgroundImage: `url(${profileData.coverImage})`, backgroundSize: "cover", backgroundPosition: "center" }
@@ -195,25 +195,15 @@ export default function ProfileOwnerView() {
             {!profileData.coverImage && (
               <div className="absolute inset-0 bg-gradient-to-r from-slate-500 to-slate-700" />
             )}
-
-            {/* Edit Button */}
-            <button
-              onClick={handleOpenEditModal}
-              className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur rounded-full shadow-sm hover:bg-[#E2D0F8] text-[#7D4DF4] transition-all opacity-0 group-hover:opacity-100 z-10"
-            >
-              <PenTool className="w-4 h-4" />
-            </button>
           </div>
 
           <div className="px-4 sm:px-8 pb-8 relative">
             {/* Avatar */}
             <div className="-mt-16 mb-4 flex justify-between items-end">
-              <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
-                <img
-                  src={profileData.profileImage || "/placeholder.svg"}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-md">
+                <div className="w-full h-full bg-gradient-to-br from-[#7D4DF4] to-[#A589FD] flex items-center justify-center text-white text-4xl font-bold">
+                  {profileData.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                </div>
               </div>
 
               <div className="mb-2 hidden sm:block">
@@ -243,7 +233,7 @@ export default function ProfileOwnerView() {
                     </p>
                   )}
                   {profileData.gpa && (
-                    <p className="text-sm text-purple-700 font-semibold mb-1">
+                    <p className="text-lg text-purple-700 font-bold mb-3 mt-2">
                       📊 GPA: {profileData.gpa}
                     </p>
                   )}
@@ -253,7 +243,11 @@ export default function ProfileOwnerView() {
                 {/* About Section */}
                 <div className="mb-6 p-4 rounded-lg bg-gradient-to-br from-purple-50 to-white border border-purple-200">
                   <h3 className="text-sm font-semibold mb-2 text-gray-900">About</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{profileData.description}</p>
+                  {profileData.description ? (
+                    <p className="text-sm text-gray-600 leading-relaxed">{profileData.description}</p>
+                  ) : (
+                    <p className="text-sm text-gray-400 italic">No about section added yet</p>
+                  )}
                 </div>
 
                 {/* Mobile Edit Button */}
@@ -356,77 +350,17 @@ export default function ProfileOwnerView() {
             </div>
 
             <div className="p-6 overflow-y-auto custom-scrollbar">
-              {/* Cover Image Upload */}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id="coverUpload"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setCoverImageFile(file);
-                    const url = URL.createObjectURL(file);
-                    setEditFormData({ ...editFormData, coverImage: url });
-                  }
-                }}
-              />
-
-              {/* Profile Image Upload */}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id="profileUpload"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setProfileImageFile(file);
-                    const url = URL.createObjectURL(file);
-                    setEditFormData({ ...editFormData, profileImage: url });
-                  }
-                }}
-              />
-
               <div className="space-y-6">
-                {/* Profile Image */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Profile Image</label>
-                  <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200">
-                      <img src={editFormData.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                    </div>
-                    <button
-                      onClick={() => document.getElementById("profileUpload").click()}
-                      className="px-4 py-2 border border-[#A589FD] text-[#7D4DF4] rounded-lg hover:bg-[#E2D0F8] text-sm font-medium"
-                    >
-                      <Upload className="w-4 h-4 inline mr-2" />
-                      Upload New
-                    </button>
-                  </div>
-                </div>
 
-                {/* Cover Image */}
+                {/* Name */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Cover Image</label>
-                  <button
-                    onClick={() => document.getElementById("coverUpload").click()}
-                    className="px-4 py-2 border border-[#A589FD] text-[#7D4DF4] rounded-lg hover:bg-[#E2D0F8] text-sm font-medium"
-                  >
-                    <Upload className="w-4 h-4 inline mr-2" />
-                    Upload Cover
-                  </button>
-                </div>
-
-                {/* Pronouns */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Pronouns</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
                   <input
                     type="text"
-                    value={editFormData.pronouns}
-                    onChange={(e) => setEditFormData({ ...editFormData, pronouns: e.target.value })}
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7D4DF4] focus:border-transparent"
-                    placeholder="e.g., he/him, she/her, they/them"
+                    placeholder="e.g., John Doe"
                   />
                 </div>
 
@@ -438,6 +372,7 @@ export default function ProfileOwnerView() {
                     value={editFormData.position}
                     onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7D4DF4] focus:border-transparent"
+                    placeholder="e.g., student"
                   />
                 </div>
 

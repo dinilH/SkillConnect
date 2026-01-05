@@ -69,9 +69,18 @@ export const ChatProvider = ({ children }) => {
 
   // Listen for new messages
   useEffect(() => {
-    if (socket) {
+    if (socket && currentUser?.id) {
       socket.on('new_message', (newMessage) => {
-        setMessages((prev) => [...prev, newMessage]);
+        // Format the message to match our expected structure
+        const formattedMessage = {
+          id: newMessage._id,
+          text: newMessage.text,
+          time: formatTime(newMessage.createdAt),
+          sender: newMessage.senderId._id === currentUser.id ? 'me' : newMessage.senderId.firstName,
+          senderId: newMessage.senderId._id,
+        };
+        
+        setMessages((prev) => [...prev, formattedMessage]);
         
         // Update chat list with last message
         setChats((prevChats) =>
@@ -92,7 +101,7 @@ export const ChatProvider = ({ children }) => {
         socket.off('new_message');
       };
     }
-  }, [socket]);
+  }, [socket, currentUser?.id]);
 
   // Fetch all users for new chats
   const fetchUsers = async () => {

@@ -91,6 +91,15 @@ export default function NavBar() {
         ${visible ? 'translate-y-0' : '-translate-y-full'}`
       }
     >
+      {/* Mobile menu toggle - Left side */}
+      <button
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpen((s) => !s)}
+        className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition mr-3"
+      >
+        {open ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
+      </button>
+
       {/* Left: Brand */}
       <div className="flex items-center gap-8">
         <Link 
@@ -178,15 +187,6 @@ export default function NavBar() {
             Logout
           </button>
         )}
-
-        {/* Mobile menu toggle */}
-        <button
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((s) => !s)}
-          className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition"
-        >
-          {open ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
-        </button>
       </div>
 
       {/* Mobile menu panel */}

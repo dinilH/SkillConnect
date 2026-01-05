@@ -164,13 +164,15 @@ export default function ChatDialog({ onClose }) {
                   messages && messages.length > 0 ? (
                     messages.map((m) => (
                       <div key={m.id} className={`flex ${m.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[75%] px-4 py-2 rounded-2xl shadow-sm ${
+                        <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl shadow-md ${
                           m.sender === 'me' 
-                            ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-br-sm' 
-                            : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
+                            ? 'bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] text-white rounded-br-sm' 
+                            : 'bg-white border border-gray-300 text-gray-800 rounded-bl-sm'
                         }`}>
-                          <div className="text-sm break-words">{m.text}</div>
-                          <div className="text-[10px] opacity-70 mt-1 text-right">{m.time}</div>
+                          <div className="text-sm break-words leading-relaxed">{m.text}</div>
+                          <div className={`text-[10px] mt-1.5 text-right ${
+                            m.sender === 'me' ? 'text-purple-200' : 'text-gray-500'
+                          }`}>{m.time}</div>
                         </div>
                       </div>
                     ))

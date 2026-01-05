@@ -2,19 +2,22 @@ import React from 'react';
 
 const MessageBubble = ({ isOwn, text, time }) => {
   return (
-    <div className={`flex flex-col mb-6 ${isOwn ? 'items-end' : 'items-start'}`}>
+    <div className={`flex flex-col mb-4 ${isOwn ? 'items-end' : 'items-start'}`}>
       
       <div 
-        className={`max-w-[70%] px-5 py-3 rounded-2xl text-sm leading-relaxed text-left
-        ${isOwn 
-          ? 'bg-purple-800 text-white rounded-tr-none' 
-          : 'bg-white border border-gray-300 text-gray-800 rounded-tl-none'
+        className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-md
+        ${
+          isOwn 
+            ? 'bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] text-white rounded-br-sm' 
+            : 'bg-white border border-gray-300 text-gray-800 rounded-bl-sm'
         }`}
       >
-        {text}
+        <div className="break-words">{text}</div>
       </div>
       
-      <span className="text-xs text-gray-400 mt-1 mx-1">{time}</span>
+      <span className={`text-xs mt-1.5 mx-2 ${
+        isOwn ? 'text-purple-600' : 'text-gray-500'
+      }`}>{time}</span>
     </div>
   );
 };
