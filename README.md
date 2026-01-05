@@ -1,11 +1,11 @@
 # SkillConnect
 
-SkillConnect is a platform where students can connect, share skills, request help, and build a community. The application features user profiles with skill showcasing, real-time messaging, community discussions, skill search with intelligent recommendations, and a leaderboard system.
+SkillConnect is a platform where students can connect, share skills, request help, and build a community. The application features user profiles with skill showcasing, real-time messaging, skill search with intelligent recommendations, and a leaderboard system.
 
 ## Team Members
 - Dinil Hansara
 - Isira Dilum
-- Sehansa Manothmi
+- Sehansa Karunathilaka 
 - Tiranga Liyanage
 - Heshan Hansana
 
@@ -25,7 +25,6 @@ SkillConnect is a platform where students can connect, share skills, request hel
 - Initials-based profile avatars with gradient backgrounds
 - Customizable profile information (name, headline, university, location, about section)
 - Skills showcase with ratings and details
-- Portfolio links with custom icons
 - GPA display
 - User verification badges
 
@@ -44,14 +43,8 @@ SkillConnect is a platform where students can connect, share skills, request hel
 - Online/offline user status
 - Conversation history
 
-### Community Features
-- Discussion boards with categories (Academics, Coding, Events, General)
-- Create and participate in discussions
-- Like and comment on posts
-- View popular discussions
 
 ### Skill Requests
-- Post skill help requests
 - Apply to help others
 - Track request status (Open, In Progress, Closed)
 - Priority levels and time estimates
@@ -66,7 +59,6 @@ SkillConnect is a platform where students can connect, share skills, request hel
 - Real-time notifications
 - User onboarding flow
 - Activity tracking
-- Dark theme UI with purple accent
 
 ## Tech Stack
 
@@ -76,7 +68,7 @@ SkillConnect is a platform where students can connect, share skills, request hel
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT with httpOnly cookies (24-hour expiration)
 - **Real-time**: Socket.io for chat and notifications
-- **File Upload**: Multer (currently disabled for profile images)
+
 
 ### Frontend
 - **Framework**: React 18 with Vite
@@ -129,7 +121,7 @@ mongod
 2. Run the backend server
 ```bash
 cd backend
-npm start
+node server.js
 ```
 The backend will run on http://localhost:5000
 
@@ -138,9 +130,9 @@ The backend will run on http://localhost:5000
 cd frontend
 npm run dev
 ```
-The frontend will run on http://localhost:5173
+The frontend will run on http://localhost:5173 - http://localhost:5176
 
-4. Open your browser and navigate to http://localhost:5173
+4. Open your browser and navigate to http://localhost:5173 
 
 ### Production Mode
 
@@ -157,7 +149,7 @@ npm run build
 ### Backend (.env file in /backend)
 ```
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/skillconnect
+MONGO_URL=mongodb://localhost:27017/skillconnect
 JWT_SECRET=your_jwt_secret_key_here
 NODE_ENV=development
 ```
@@ -193,13 +185,6 @@ Default API URL is configured in the code. Update API endpoints in frontend if y
 ### Conversations
 - `GET /api/conversations` - Get all conversations for user
 - `POST /api/conversations` - Create new conversation
-
-### Posts
-- `GET /api/posts` - Get all posts (with filters)
-- `POST /api/posts` - Create a new post
-- `GET /api/posts/:id` - Get post by ID
-- `PUT /api/posts/:id/like` - Like/unlike a post
-- `DELETE /api/posts/:id` - Delete a post
 
 ### Discussions
 - `GET /api/discussions` - Get all discussions
@@ -238,13 +223,6 @@ Default API URL is configured in the code. Update API endpoints in frontend if y
     detail: String,
     rating: Number (1-5)
   }],
-  
-  portfolio: [{
-    title: String,
-    url: String,
-    iconType: String
-  }],
-  
   activityStreak: Number,
   lastActive: Date,
   createdAt: Date
@@ -272,16 +250,7 @@ Default API URL is configured in the code. Update API endpoints in frontend if y
 }
 ```
 
-### Post Model
-```javascript
-{
-  author: ObjectId (ref: User),
-  content: String,
-  image: String,
-  likes: [ObjectId] (ref: User),
-  createdAt: Date
-}
-```
+
 
 ### Discussion Model
 ```javascript
