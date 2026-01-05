@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
@@ -41,6 +42,7 @@ app.set("io", io);
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use(
     cors({
         origin: CLIENT_URLS,

@@ -158,6 +158,24 @@ exports.getMySkillRequests = async (req, res) => {
   }
 };
 
+// Get assigned skill requests (where user is the helper)
+exports.getAssignedSkillRequests = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const requests = await SkillRequest.find({ assignedTo: userId })
+      .populate("author", "firstName lastName username profileImage")
+      .populate("assignedTo", "firstName lastName username")
+      .populate("responses.user", "firstName lastName username profileImage")
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, requests });
+  } catch (error) {
+    console.error("Get Assigned Skill Requests Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
 // Get single skill request by ID
 exports.getSkillRequestById = async (req, res) => {
   try {
@@ -391,6 +409,118 @@ exports.acceptResponse = async (req, res) => {
     res.json({ success: true, request: populated });
   } catch (error) {
     console.error("Accept Response Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Decline a response
+exports.declineResponse = async (req, res) => {
+  try {
+    const { id, responseId } = req.params;
+    const { userId } = req.body;
+
+    const request = await SkillRequest.findById(id);
+
+    if (!request) {
+      return res.json({ success: false, message: "Skill request not found" });
+    }
+
+    // Check if user is the author
+    if (request.author.toString() !== userId) {
+      return res.json({
+        success: false,
+        message: "Only the request author can decline responses",
+      });
+    }
+
+    const response = request.responses.id(responseId);
+
+    if (!response) {
+      return res.json({ success: false, message: "Response not found" });
+    }
+
+    // Update response status
+    response.status = "rejected";
+
+    await request.save();
+
+    const populated = await SkillRequest.findById(request._id)
+      .populate("author", "firstName lastName username profileImage")
+      .populate("assignedTo", "firstName lastName username profileImage")
+      .populate("responses.user", "firstName lastName username profileImage");
+
+    res.json({ success: true, request: populated });
+  } catch (error) {
+    console.error("Decline Response Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Get notifications for a user
+exports.getUserNotifications = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find all skill requests where user is the author or has responded
+    const myRequests = await SkillRequest.find({ author: userId })
+      .populate("author", "firstName lastName username profileImage")
+      .populate("responses.user", "firstName lastName username profileImage")
+      .select("_id title responses");
+
+    const requestsIRespondedTo = await SkillRequest.find({
+      "responses.user": userId,
+    })
+      .populate("author", "firstName lastName username profileImage")
+      .populate("responses.user", "firstName lastName username profileImage")
+      .select("_id title author responses");
+
+    const notifications = [];
+
+    // Add pending responses to my requests
+    myRequests.forEach((request) => {
+      request.responses?.forEach((response) => {
+        if (response.status === "pending") {
+          notifications.push({
+            type: "response_received",
+            _id: response._id,
+            requestId: request._id,
+            requestTitle: request.title,
+            fromUser: response.user,
+            message: response.message,
+            createdAt: response.createdAt,
+            read: false,
+          });
+        }
+      });
+    });
+
+    // Add accepted responses to requests I applied to
+    requestsIRespondedTo.forEach((request) => {
+      request.responses?.forEach((response) => {
+        if (
+          response.user._id.toString() === userId &&
+          response.status === "accepted"
+        ) {
+          notifications.push({
+            type: "response_accepted",
+            _id: response._id,
+            requestId: request._id,
+            requestTitle: request.title,
+            fromUser: request.author,
+            message: `Your offer to help with "${request.title}" was accepted!`,
+            createdAt: response.updatedAt || response.createdAt,
+            read: false,
+          });
+        }
+      });
+    });
+
+    // Sort by most recent
+    notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.json({ success: true, notifications });
+  } catch (error) {
+    console.error("Get User Notifications Error:", error);
     res.json({ success: false, message: "Server error" });
   }
 };

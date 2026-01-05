@@ -19,7 +19,6 @@ export default function Leaderboard() {
     try {
       setLoading(true);
       const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-      const token = localStorage.getItem("token");
       
       let url = `${apiBase}/leaderboard?filter=${filter}`;
       
@@ -33,9 +32,7 @@ export default function Leaderboard() {
       }
 
       const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include'
       });
 
       const data = await response.json();

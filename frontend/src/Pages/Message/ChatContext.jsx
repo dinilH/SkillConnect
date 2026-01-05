@@ -188,7 +188,10 @@ export const ChatProvider = ({ children }) => {
 
   const deleteConversation = async (conversationId) => {
     try {
-      const res = await fetch(`${API_URL}/conversations/${conversationId}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/conversations/${conversationId}`, { 
+        method: 'DELETE',
+        credentials: 'include'
+      });
       const data = await res.json();
       if (data.success) {
         setChats((prev) => prev.filter((c) => c._id !== conversationId));
@@ -207,6 +210,7 @@ export const ChatProvider = ({ children }) => {
       const response = await fetch(`${API_URL}/conversations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           participant1: currentUser.id,
           participant2: otherUserId,
@@ -214,10 +218,7 @@ export const ChatProvider = ({ children }) => {
       });
       const data = await response.json();
       if (data.success) {
-        // Refresh conversations
-        await fetchConversations();
-        
-        // Find and select the new conversation
+        // Format the conversation for immediate use
         const otherParticipant = data.conversation.participants.find(
           (p) => p._id !== currentUser.id
         );
@@ -232,7 +233,19 @@ export const ChatProvider = ({ children }) => {
           unread: 0,
           color: getRandomColor(),
         };
+        
+        // Set selected chat immediately
         setSelectedChat(formattedChat);
+        
+        // Update chats list
+        setChats((prevChats) => {
+          const existing = prevChats.find(c => c._id === formattedChat._id);
+          if (existing) {
+            return prevChats.map(c => c._id === formattedChat._id ? formattedChat : c);
+          }
+          return [formattedChat, ...prevChats];
+        });
+        
         return formattedChat;
       }
     } catch (error) {
@@ -252,6 +265,7 @@ export const ChatProvider = ({ children }) => {
       const response = await fetch(`${API_URL}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           conversationId: selectedChat._id,
           senderId: currentUser.id,

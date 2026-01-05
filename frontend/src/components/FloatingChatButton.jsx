@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { FaComments, FaArrowLeft } from 'react-icons/fa'
 import { useNavigate, useLocation } from 'react-router-dom'
 import ChatDialog from './chat/ChatDialog';
@@ -10,13 +10,29 @@ export default function FloatingChatButton() {
   
   const isOnChatPage = location.pathname === '/chat'
 
-  const { chats } = useChat();
+  const { chats, startConversation } = useChat();
   const [open, setOpen] = useState(false);
 
   const unreadTotal = useMemo(() => {
     if (!chats?.length) return 0;
     return chats.reduce((sum, c) => sum + (c.unread || 0), 0);
   }, [chats]);
+
+  // Listen for custom event to open chat dialog with specific user
+  useEffect(() => {
+    const handleOpenChat = async (event) => {
+      const { userId } = event.detail;
+      if (userId) {
+        await startConversation(userId);
+        setOpen(true);
+      }
+    };
+
+    window.addEventListener('openChatDialog', handleOpenChat);
+    return () => {
+      window.removeEventListener('openChatDialog', handleOpenChat);
+    };
+  }, [startConversation]);
 
   return (
     <>

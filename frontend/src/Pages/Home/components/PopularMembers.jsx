@@ -2,12 +2,17 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../AuthContext";
 import { MessageCircle } from "lucide-react";
+import ChatDialog from "../../../components/chat/ChatDialog";
+import { useChat } from "../../../Pages/Message/ChatContext";
 
 export default function PopularMembers() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { startConversation } = useChat();
 
   useEffect(() => {
     fetchPopularMembers();
@@ -15,7 +20,7 @@ export default function PopularMembers() {
 
   const fetchPopularMembers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/popular?limit=4');
+      const response = await fetch('http://localhost:5000/api/users/popular?limit=10');
       const data = await response.json();
       if (data.success) {
         setMembers(data.users);
@@ -27,9 +32,19 @@ export default function PopularMembers() {
     }
   };
 
-  const handleMessage = (userId, e) => {
+  const handleMessage = async (userId, e) => {
     e.stopPropagation();
-    navigate(`/messages?userId=${userId}`);
+    try {
+      const conversation = await startConversation(userId);
+      if (conversation) {
+        // Wait a moment for messages to load
+        setTimeout(() => {
+          setChatOpen(true);
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    }
   };
 
   const handleEndorse = async (userId, e) => {
@@ -44,9 +59,9 @@ export default function PopularMembers() {
       const response = await fetch(`http://localhost:5000/api/users/${userId}/endorse`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ endorserId: user.id || user.userId })
       });
 
@@ -72,22 +87,24 @@ export default function PopularMembers() {
     );
   }
 
+  const displayMembers = showAll ? members : members.slice(0, 4);
+
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         <button 
-          onClick={() => navigate('/skill-search')}
+          onClick={() => setShowAll(!showAll)}
           className="text-sm px-3 py-1 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 transition ml-auto"
         >
-          View All →
+          {showAll ? '← Show Less' : `View All (${members.length})`}
         </button>
       </div>
 
       {members.length === 0 ? (
         <p className="text-gray-500 text-center py-8">No members found</p>
       ) : (
-        <div className="space-y-3">
-          {members.map((m) => (
+        <div className={`space-y-3 ${showAll ? 'max-h-96 overflow-y-auto pr-2' : ''}`}>
+          {displayMembers.map((m) => (
             <div
               key={m._id}
               className="flex items-center gap-2 p-3 rounded-xl border border-purple-100 hover:border-purple-300 hover:bg-purple-50/30 transition cursor-pointer"
@@ -137,6 +154,7 @@ export default function PopularMembers() {
           ))}
         </div>
       )}
+      {chatOpen && <ChatDialog onClose={() => setChatOpen(false)} />}
     </div>
   );
 }

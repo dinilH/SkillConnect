@@ -19,15 +19,11 @@ export default function ProfileOwnerView() {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
   
   const getAPI = () => {
-    const currentToken = localStorage.getItem("token");
     return axios.create({
       baseURL: "http://localhost:5000/api",
-      headers: {
-        Authorization: `Bearer ${currentToken}`,
-      },
+      withCredentials: true,  // Send cookies with requests
     });
   };
 
@@ -47,6 +43,7 @@ export default function ProfileOwnerView() {
     specialization: "",
     description: "",
     skills: [],
+    gpa: null,
   });
 
   const [editFormData, setEditFormData] = useState(profileData);
@@ -119,7 +116,7 @@ export default function ProfileOwnerView() {
 
   // Fetch profile data on mount
   useEffect(() => {
-    if (!userId || !token) return;
+    if (!userId) return;
 
     getAPI().get(`/profile/${userId}`)
       .then(res => {
@@ -135,6 +132,7 @@ export default function ProfileOwnerView() {
           specialization: user.specialization || "",
           description: user.about || "",
           skills: user.skills || [],
+          gpa: user.gpa || null,
         });
 
         setEditFormData({
@@ -148,12 +146,13 @@ export default function ProfileOwnerView() {
           specialization: user.specialization || "",
           description: user.about || "",
           skills: user.skills || [],
+          gpa: user.gpa || null,
         });
       })
       .catch(err => {
         console.error("Profile load error:", err);
       });
-  }, [userId, token]);
+  }, [userId]);
 
   // Redirect to home if not authenticated or when user logs out
   useEffect(() => {
@@ -235,15 +234,17 @@ export default function ProfileOwnerView() {
                     <h1 className="text-2xl font-bold text-gray-900">
                       {profileData.name} <span className="text-gray-500 text-lg font-normal">{profileData.pronouns}</span>
                     </h1>
-                    <span className="w-fit flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 text-xs px-2 py-0.5 rounded-full font-medium">
-                      <Star className="w-3 h-4 text-yellow-500 fill-yellow-500" />{avgRating}
-                    </span>
                   </div>
                   <p className="text-base text-gray-900 font-medium mb-1">{profileData.position}</p>
                   {profileData.course && (
                     <p className="text-sm text-gray-700 font-medium mb-1">
                       📚 {profileData.course}
                       {profileData.specialization && <span className="text-gray-500"> • {profileData.specialization}</span>}
+                    </p>
+                  )}
+                  {profileData.gpa && (
+                    <p className="text-sm text-purple-700 font-semibold mb-1">
+                      📊 GPA: {profileData.gpa}
                     </p>
                   )}
                   <p className="text-sm text-gray-500 font-medium">{profileData.university}</p>
@@ -304,6 +305,8 @@ export default function ProfileOwnerView() {
         </div>
 
         {/* ================= COMMUNITY DISCUSSIONS ================= */}
+        {/* Hidden as per user request */}
+        {false && (
         <div className="bg-white rounded-2xl shadow-lg border border-purple-200 p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">My Community Discussions</h2>
           
@@ -330,6 +333,7 @@ export default function ProfileOwnerView() {
             </div>
           )}
         </div>
+        )}
       </main>
 
       {/* ================= EDIT PROFILE MODAL ================= */}

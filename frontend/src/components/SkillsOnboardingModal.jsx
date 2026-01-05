@@ -35,6 +35,37 @@ export default function SkillsOnboardingModal({ isOpen, onClose, onComplete, use
     "Tailwind CSS"
   ];
 
+  // Dynamic subcategory suggestions based on skill name
+  const getSubcategorySuggestions = (skillName) => {
+    const skill = skillName.toLowerCase();
+    
+    const subcategoryMap = {
+      'web development': ['Frontend', 'Backend', 'Full Stack', 'React', 'Vue.js', 'Angular'],
+      'javascript': ['React', 'Vue.js', 'Node.js', 'Express', 'TypeScript', 'Next.js'],
+      'python': ['Django', 'Flask', 'FastAPI', 'Data Science', 'Machine Learning', 'Automation'],
+      'ui/ux design': ['Figma', 'Adobe XD', 'Sketch', 'Wireframing', 'Prototyping', 'User Research'],
+      'graphic design': ['Photoshop', 'Illustrator', 'Logo Design', 'Branding', 'Typography', 'InDesign'],
+      'data analysis': ['Excel', 'Python', 'R', 'SQL', 'Tableau', 'Power BI'],
+      'machine learning': ['TensorFlow', 'PyTorch', 'Scikit-learn', 'Deep Learning', 'NLP', 'Computer Vision'],
+      'cloud computing': ['AWS', 'Azure', 'Google Cloud', 'Docker', 'Kubernetes', 'DevOps'],
+      'java': ['Spring Boot', 'Hibernate', 'Maven', 'Android', 'JavaFX', 'Servlets'],
+      'react': ['Hooks', 'Redux', 'Next.js', 'React Native', 'Context API', 'Material-UI'],
+      'node.js': ['Express', 'MongoDB', 'REST API', 'GraphQL', 'Socket.io', 'Nest.js'],
+    };
+
+    // Find matching skill
+    for (const [key, values] of Object.entries(subcategoryMap)) {
+      if (skill.includes(key) || key.includes(skill)) {
+        return values;
+      }
+    }
+
+    // Default suggestions if no match
+    return ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+  };
+
+  const subcategorySuggestions = getSubcategorySuggestions(newSkill.title);
+
   if (!isOpen) return null;
 
   const handleAddSkill = () => {
@@ -61,14 +92,13 @@ export default function SkillsOnboardingModal({ isOpen, onClose, onComplete, use
 
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
       const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const response = await fetch(`${apiBase}/profile/${userId}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
+        credentials: 'include',
         body: JSON.stringify({ skills }),
       });
 
@@ -154,7 +184,7 @@ export default function SkillsOnboardingModal({ isOpen, onClose, onComplete, use
                 list="subskill-suggestions"
               />
               <datalist id="subskill-suggestions">
-                {COMMON_SKILLS.map((s) => (
+                {subcategorySuggestions.map((s) => (
                   <option key={s} value={s} />
                 ))}
               </datalist>
@@ -230,7 +260,7 @@ export default function SkillsOnboardingModal({ isOpen, onClose, onComplete, use
 
           {skills.length === 0 && (
             <div className="text-center py-8 text-gray-400 text-sm">
-              No skills added yet. Add at least one skill or skip for now.
+              No skills added yet. Add at least one skill to continue.
             </div>
           )}
         </div>
@@ -278,12 +308,9 @@ export default function SkillsOnboardingModal({ isOpen, onClose, onComplete, use
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-6 flex justify-between items-center bg-gray-50">
-          <button
-            onClick={handleSkipForNow}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium text-sm transition-colors"
-          >
-            Skip for now
-          </button>
+          <div className="text-sm text-gray-500">
+            {skills.length === 0 ? 'Add at least one skill to continue' : `${skills.length} skill${skills.length > 1 ? 's' : ''} added`}
+          </div>
           
           <div className="flex gap-3">
             {currentStep > 0 && (
@@ -305,10 +332,10 @@ export default function SkillsOnboardingModal({ isOpen, onClose, onComplete, use
             ) : (
               <button
                 onClick={handleComplete}
-                disabled={isSubmitting}
+                disabled={isSubmitting || skills.length === 0}
                 className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed font-medium text-sm transition-all"
               >
-                {isSubmitting ? "Saving..." : skills.length > 0 ? "Complete Setup" : "Skip"}
+                {isSubmitting ? "Saving..." : "Complete Setup"}
               </button>
             )}
           </div>

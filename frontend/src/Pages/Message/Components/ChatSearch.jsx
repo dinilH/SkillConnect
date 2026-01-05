@@ -28,7 +28,10 @@ const ChatSearch = () => {
       try {
         const excludeId = currentUser?.id || '';
         const response = await fetch(
-          `${API_URL}/users/search?query=${encodeURIComponent(searchQuery)}&excludeId=${excludeId}`
+          `${API_URL}/users/search?query=${encodeURIComponent(searchQuery)}&excludeId=${excludeId}`,
+          {
+            credentials: 'include'
+          }
         );
         const data = await response.json();
         if (data.success) {

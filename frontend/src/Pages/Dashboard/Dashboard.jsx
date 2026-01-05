@@ -10,27 +10,49 @@ import GPACalculator from "../../components/GPACalculator"
 import Leaderboard from "../../components/Leaderboard"
 
 export default function Dashboard() {
-    const { isAuthenticated, user, loading } = useAuth();
+    const { isAuthenticated, user, loading, updateUser } = useAuth();
     const navigate = useNavigate();
     const [lastGpaCalculation, setLastGpaCalculation] = useState(null);
     const [currentGpa, setCurrentGpa] = useState(null);
     const [showGPAModal, setShowGPAModal] = useState(false);
 
     useEffect(() => {
-        // Load GPA data from localStorage
+        // Load GPA data from user object first, then localStorage
+        if (user?.gpa) {
+            setCurrentGpa(user.gpa.toString());
+        } else {
+            try {
+                const storedGpa = localStorage.getItem('skillconnect_current_gpa');
+                if (storedGpa) setCurrentGpa(storedGpa);
+            } catch (e) {
+                console.error('Error loading GPA data:', e);
+            }
+        }
+        
         try {
-            const storedGpa = localStorage.getItem('skillconnect_current_gpa');
             const lastCalcDate = localStorage.getItem('skillconnect_gpa_last_calculated');
-            if (storedGpa) setCurrentGpa(storedGpa);
             if (lastCalcDate) setLastGpaCalculation(new Date(lastCalcDate));
         } catch (e) {
-            console.error('Error loading GPA data:', e);
+            console.error('Error loading date:', e);
         }
-    }, []);
+    }, [user]);
 
     // Reload GPA data when modal closes
     useEffect(() => {
-        if (!showGPAModal) {
+        if (!showGPAModal && user?.id) {
+            // Fetch fresh user data from backend
+            fetch(`http://localhost:5000/api/profile/${user.id}`, {
+                credentials: 'include'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.user?.gpa) {
+                    setCurrentGpa(data.user.gpa.toString());
+                    updateUser({ ...user, gpa: data.user.gpa });
+                }
+            })
+            .catch(err => console.error('Error fetching user GPA:', err));
+            
             try {
                 const storedGpa = localStorage.getItem('skillconnect_current_gpa');
                 const lastCalcDate = localStorage.getItem('skillconnect_gpa_last_calculated');
@@ -40,7 +62,7 @@ export default function Dashboard() {
                 console.error('Error loading GPA data:', e);
             }
         }
-    }, [showGPAModal]);
+    }, [showGPAModal, user?.id]);
 
     // Redirect to home if not authenticated or when user logs out
     useEffect(() => {

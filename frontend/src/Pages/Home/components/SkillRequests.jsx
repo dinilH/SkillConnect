@@ -15,28 +15,30 @@ export default function SkillRequests() {
 
   const fetchFeaturedRequests = async () => {
     try {
-      // If logged in, personalize by user skills using /skill-requests
+      // If logged in, personalize by user skills using /api/skill-requests
       if (isAuthenticated && (user?.id || user?._id || user?.userId)) {
         const uid = user.id || user._id || user.userId;
-        const res = await fetch(`http://localhost:5000/skill-requests?userId=${uid}`);
+        const res = await fetch(`http://localhost:5000/api/skill-requests?userId=${uid}`);
         const data = await res.json();
         if (data.success) {
-          setRequests((data.requests || []).slice(0, 3));
+          // Show only top 2 matching requests
+          setRequests((data.requests || []).slice(0, 2));
         } else {
           setRequests([]);
         }
       } else {
         // Fallback to featured list when not authenticated
-        const response = await fetch("http://localhost:5000/skill-requests/featured?limit=3");
+        const response = await fetch("http://localhost:5000/api/skill-requests/featured?limit=2");
         const data = await response.json();
         if (data.success) {
-          setRequests(data.requests);
+          setRequests(data.requests || []);
         } else {
           setRequests([]);
         }
       }
     } catch (error) {
       console.error("Error fetching featured requests:", error);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,7 @@ export default function SkillRequests() {
     return (
       <div className="w-full">
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
+          {[1, 2].map((i) => (
             <div key={i} className="p-3 rounded-xl border border-purple-100 animate-pulse">
               <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
               <div className="h-3 bg-gray-200 rounded w-1/2"></div>

@@ -121,9 +121,9 @@ export default function CommunityPage() {
       const response = await fetch("http://localhost:5000/api/discussions", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "Content-Type": "application/json"
         },
+        credentials: 'include',
         body: JSON.stringify({
           ...form,
           authorId: user.id || user.userId
@@ -163,9 +163,9 @@ export default function CommunityPage() {
       const response = await fetch("http://localhost:5000/api/discussions", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
         },
+        credentials: 'include',
         body: JSON.stringify({
           title: form.title,
           category: form.category || "General",

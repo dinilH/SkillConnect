@@ -125,11 +125,12 @@ export default function CreateAccountForm() {
           const loginRes = await fetch(`${apiBase}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ email: formData.email, password: formData.password }),
           });
           const loginData = await loginRes.json();
-          if (loginRes.ok && loginData.success && loginData.token && loginData.user) {
-            login(loginData.token, loginData.user);
+          if (loginRes.ok && loginData.success && loginData.user) {
+            login(loginData.user);
             // Navigate to dashboard to trigger global onboarding gate
             navigate("/dashboard");
           }

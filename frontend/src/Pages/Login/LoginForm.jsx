@@ -26,14 +26,15 @@ function LoginPageV2() {
             const res = await fetch(`${apiBase}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ email, password }),
             });
 
             const data = await res.json();
 
-            if (res.ok && data.success && data.token && data.user) {
+            if (res.ok && data.success && data.user) {
                 // persist auth
-                login(data.token, data.user);
+                login(data.user);
                 setLoggedInUser(data.user);
                 setIsLoading(false);
                 

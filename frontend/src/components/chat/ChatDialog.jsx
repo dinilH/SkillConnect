@@ -1,10 +1,44 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useChat } from '../../Pages/Message/ChatContext';
 
 export default function ChatDialog({ onClose }) {
   const { chats, selectedChat, messages, onSelectChat, onSendMessage, deleteConversation, markAllSeen } = useChat();
   const [minimized, setMinimized] = useState(false);
   const [input, setInput] = useState('');
+  
+  const unreadCount = chats?.reduce((sum, c) => sum + (c.unread || 0), 0) || 0;
+
+  // Handle auto-populated message from notifications
+  useEffect(() => {
+    const handleAutoMessage = () => {
+      const pendingMessage = localStorage.getItem('pending_chat_message');
+      if (pendingMessage) {
+        setInput(pendingMessage);
+        localStorage.removeItem('pending_chat_message');
+      }
+    };
+
+    // Check for pending message on mount
+    handleAutoMessage();
+
+    // Listen for custom event from NotificationBell
+    window.addEventListener('openChatWithMessage', handleAutoMessage);
+
+    return () => {
+      window.removeEventListener('openChatWithMessage', handleAutoMessage);
+    };
+  }, []);
+
+  // Check for pending message when conversation changes
+  useEffect(() => {
+    if (selectedChat) {
+      const pendingMessage = localStorage.getItem('pending_chat_message');
+      if (pendingMessage) {
+        setInput(pendingMessage);
+        localStorage.removeItem('pending_chat_message');
+      }
+    }
+  }, [selectedChat]);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -12,10 +46,36 @@ export default function ChatDialog({ onClose }) {
     setInput('');
   };
 
+  if (minimized) {
+    return (
+      <div className="fixed bottom-0 right-6 z-[60]">
+        <button
+          onClick={() => setMinimized(false)}
+          className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] text-white rounded-t-xl shadow-lg hover:shadow-xl transition-all"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
+            <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
+          </svg>
+          <div className="flex flex-col items-start">
+            <span className="font-semibold text-sm">Messages</span>
+            {unreadCount > 0 && <span className="text-xs">({unreadCount} unread)</span>}
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            className="ml-2 hover:bg-white/20 rounded-full p-1 transition"
+          >
+            ✕
+          </button>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[60]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMinimized(true)} />
 
       {/* Dialog */}
       <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 w-[95vw] sm:w-[700px] lg:w-[900px] h-[85vh] sm:h-[600px] bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-purple-300">

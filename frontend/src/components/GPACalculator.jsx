@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useModal } from '../ModalContext';
+import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 export default function GPACalculator() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
   const { openAuthModal } = useModal();
   const [courses, setCourses] = useState([
     { id: 1, name: '', credits: '', grade: '' }
@@ -11,6 +12,9 @@ export default function GPACalculator() {
   const [gpa, setGpa] = useState(null);
   const [currentGpa, setCurrentGpa] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [showPastModules, setShowPastModules] = useState(false);
+  const [pastModules, setPastModules] = useState([]);
+  const [loadingModules, setLoadingModules] = useState(false);
 
   const gradePoints = {
     'A+': 4.0, 'A': 4.0, 'A-': 3.7,
@@ -39,6 +43,7 @@ export default function GPACalculator() {
     let totalPoints = 0;
     let totalCredits = 0;
 
+    // Calculate from current courses
     for (let course of courses) {
       if (course.credits && course.grade) {
         const credits = parseFloat(course.credits);
@@ -48,6 +53,17 @@ export default function GPACalculator() {
           totalPoints += credits * points;
           totalCredits += credits;
         }
+      }
+    }
+
+    // Include past modules in calculation
+    for (let module of pastModules) {
+      const credits = parseFloat(module.credits);
+      const points = gradePoints[module.grade];
+      
+      if (!isNaN(credits) && points !== undefined) {
+        totalPoints += credits * points;
+        totalCredits += credits;
       }
     }
 
@@ -83,18 +99,39 @@ export default function GPACalculator() {
 
     setSaving(true);
     try {
+      // Prepare modules data from current courses
+      const modulesToSave = courses
+        .filter(course => course.name && course.credits && course.grade)
+        .map(course => ({
+          name: course.name,
+          credits: parseFloat(course.credits),
+          grade: course.grade,
+          semester: '', // Can be extended to capture semester info
+          year: new Date().getFullYear(),
+          completedAt: new Date()
+        }));
+
       const response = await fetch(`http://localhost:5000/api/users/${user.id || user.userId}/gpa`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ gpa })
+        credentials: 'include',
+        body: JSON.stringify({ 
+          gpa,
+          modules: modulesToSave
+        })
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('GPA saved successfully!');
+        alert('GPA and modules saved successfully!');
+        // Update user context with new GPA
+        updateUser({ ...user, gpa: parseFloat(gpa) });
+        // Reload past modules
+        fetchModuleHistory();
+        // Reset current courses
+        setCourses([{ id: Date.now(), name: '', credits: '', grade: '' }]);
       } else {
         alert('Failed to save GPA: ' + data.message);
       }
@@ -103,6 +140,51 @@ export default function GPACalculator() {
       alert('Failed to save GPA. Please try again.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const fetchModuleHistory = async () => {
+    if (!isAuthenticated || !user) return;
+
+    setLoadingModules(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/${user.id || user.userId}/modules`, {
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setPastModules(data.moduleHistory || []);
+        if (data.gpa) {
+          setCurrentGpa(data.gpa);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching module history:', error);
+    } finally {
+      setLoadingModules(false);
+    }
+  };
+
+  const deleteModule = async (moduleId) => {
+    if (!window.confirm('Are you sure you want to delete this module?')) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/${user.id || user.userId}/modules/${moduleId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setPastModules(data.moduleHistory || []);
+        alert('Module deleted successfully!');
+      } else {
+        alert('Failed to delete module: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error deleting module:', error);
+      alert('Failed to delete module. Please try again.');
     }
   };
 
@@ -115,6 +197,13 @@ export default function GPACalculator() {
       }
     } catch {}
   }, []);
+
+  // Fetch module history when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchModuleHistory();
+    }
+  }, [isAuthenticated, user]);
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
@@ -133,6 +222,63 @@ export default function GPACalculator() {
           <p className="text-sm text-gray-700">
             Your current GPA is <span className="font-semibold text-purple-700">{currentGpa}</span>
           </p>
+        </div>
+      )}
+
+      {/* Past Modules Section - Collapsible */}
+      {isAuthenticated && pastModules.length > 0 && (
+        <div className="mb-4 border border-purple-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setShowPastModules(!showPastModules)}
+            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-gray-800">Past Modules ({pastModules.length})</h3>
+              <span className="text-xs text-gray-600">
+                Total Credits: {pastModules.reduce((sum, m) => sum + parseFloat(m.credits || 0), 0)}
+              </span>
+            </div>
+            {showPastModules ? (
+              <ChevronUp className="w-5 h-5 text-gray-600" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+          
+          {showPastModules && (
+            <div className="p-4 bg-white max-h-64 overflow-y-auto">
+              {loadingModules ? (
+                <p className="text-sm text-gray-500 text-center py-4">Loading modules...</p>
+              ) : (
+                <div className="space-y-2">
+                  {pastModules.map((module) => (
+                    <div
+                      key={module._id}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800 text-sm">{module.name}</p>
+                        <div className="flex gap-3 mt-1">
+                          <span className="text-xs text-gray-600">{module.credits} credits</span>
+                          <span className="text-xs font-semibold text-purple-600">Grade: {module.grade}</span>
+                          {module.year && (
+                            <span className="text-xs text-gray-500">{module.year}</span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deleteModule(module._id)}
+                        className="ml-2 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete module"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -239,6 +385,11 @@ export default function GPACalculator() {
         <p className="text-xs text-gray-600">
           <strong>Note:</strong> This calculator uses the standard 4.0 GPA scale. 
           Enter your course credits and select the grade you received to calculate your GPA.
+          {pastModules.length > 0 && (
+            <span className="block mt-1 text-purple-700 font-medium">
+              ✓ Your past modules are automatically included in the calculation.
+            </span>
+          )}
         </p>
       </div>
     </div>

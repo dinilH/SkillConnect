@@ -17,9 +17,9 @@ export function useActivityTracker() {
       await fetch(`http://localhost:5000/api/users/${user.id || user.userId}/activity`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ isOnline })
       });
     } catch (error) {

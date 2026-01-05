@@ -60,15 +60,37 @@ exports.searchUsers = async (req, res) => {
 exports.updateGPA = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { gpa } = req.body;
+    const { gpa, modules } = req.body;
 
     if (gpa === undefined || gpa === null) {
       return res.json({ success: false, message: "GPA is required" });
     }
 
+    const updateData = { gpa: parseFloat(gpa) };
+
+    // If modules are provided, append them to moduleHistory
+    if (modules && Array.isArray(modules) && modules.length > 0) {
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.json({ success: false, message: "User not found" });
+      }
+
+      // Add new modules to history
+      user.moduleHistory.push(...modules);
+      user.gpa = parseFloat(gpa);
+      await user.save();
+
+      return res.json({ 
+        success: true, 
+        message: "GPA and modules updated successfully", 
+        gpa: user.gpa,
+        moduleHistory: user.moduleHistory
+      });
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
-      { gpa: parseFloat(gpa) },
+      updateData,
       { new: true }
     );
 
@@ -79,6 +101,54 @@ exports.updateGPA = async (req, res) => {
     res.json({ success: true, message: "GPA updated successfully", gpa: user.gpa });
   } catch (error) {
     console.error("Update GPA Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Get user's module history
+exports.getModuleHistory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).select("moduleHistory gpa");
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    res.json({ 
+      success: true, 
+      moduleHistory: user.moduleHistory || [],
+      gpa: user.gpa
+    });
+  } catch (error) {
+    console.error("Get Module History Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Delete a specific module from history
+exports.deleteModule = async (req, res) => {
+  try {
+    const { userId, moduleId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    user.moduleHistory = user.moduleHistory.filter(
+      module => module._id.toString() !== moduleId
+    );
+
+    await user.save();
+
+    res.json({ 
+      success: true, 
+      message: "Module deleted successfully",
+      moduleHistory: user.moduleHistory
+    });
+  } catch (error) {
+    console.error("Delete Module Error:", error);
     res.json({ success: false, message: "Server error" });
   }
 };

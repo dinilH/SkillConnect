@@ -35,11 +35,12 @@ export default function AuthModal() {
       const res = await fetch(`${apiBase}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Important: include cookies
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (res.ok && data.success && data.token && data.user) {
-        login(data.token, data.user);
+      if (res.ok && data.success && data.user) {
+        login(data.user); // Only pass user data, token is in cookie
         closeAuthModal();
         // Redirect to dashboard after successful login
         navigate("/dashboard");

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import NavBar from "../../components/NavBar";
 import { useAuth } from "../../AuthContext";
+import ChatDialog from "../../components/chat/ChatDialog";
+import { useChat } from "../Message/ChatContext";
 
 import {
   Star,
@@ -16,13 +18,14 @@ export default function ProfileViewerView() {
   const { userId } = useParams();
   const navigate = useNavigate();
   const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   
   // --- State ---
   const [userData, setUserData] = useState(null);
   const [discussions, setDiscussions] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [discussionsLoading, setDiscussionsLoading] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
+  const { startConversation } = useChat();
 
   // Redirect to home if not authenticated or when user logs out
   useEffect(() => {
@@ -41,7 +44,7 @@ export default function ProfileViewerView() {
   const fetchUserData = async () => {
     try {
       const response = await fetch(`${apiBase}/profile/${userId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: 'include'
       });
       const data = await response.json();
       
@@ -97,6 +100,24 @@ export default function ProfileViewerView() {
     ? (userData.skills.reduce((sum, s) => sum + (s.rating || 0), 0) / userData.skills.length).toFixed(1)
     : "N/A";
 
+  const handleMessage = async () => {
+    if (!startConversation) {
+      console.error('Chat context not available');
+      return;
+    }
+    try {
+      const conversation = await startConversation(userId);
+      if (conversation) {
+        // Wait a moment for messages to load
+        setTimeout(() => {
+          setChatOpen(true);
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    }
+  };
+
   return (
       <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-white font-sans text-gray-800">
 
@@ -114,8 +135,8 @@ export default function ProfileViewerView() {
             </div>
 
             <div className="px-4 sm:px-8 pb-8 relative">
-              {/* Avatar */}
-              <div className="-mt-16 mb-4 inline-block relative z-10">
+              {/* Avatar and Message Button */}
+              <div className="-mt-16 mb-4 flex justify-between items-end">
                 <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
@@ -124,6 +145,15 @@ export default function ProfileViewerView() {
                       {userData.firstName?.[0]}{userData.lastName?.[0]}
                     </div>
                   )}
+                </div>
+
+                <div className="mb-2 hidden sm:block">
+                  <button
+                    onClick={handleMessage}
+                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] text-white font-semibold text-sm hover:shadow-lg transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Send Message
+                  </button>
                 </div>
               </div>
 
@@ -135,9 +165,6 @@ export default function ProfileViewerView() {
                       <h1 className="text-2xl font-bold text-gray-900">
                         {userData.firstName} {userData.lastName} {userData.pronouns && <span className="text-gray-500 text-lg font-normal">({userData.pronouns})</span>}
                       </h1>
-                      <span className="w-fit flex items-center gap-1 text-purple-700 bg-purple-50 border border-purple-200 text-xs px-2 py-0.5 rounded-full font-medium">
-                        <Star className="w-3 h-4 text-yellow-500 fill-yellow-500" />{avgRating}
-                      </span>
                     </div>
                     {userData.headline && (
                       <p className="text-base text-gray-900 font-medium mb-1">{userData.headline}</p>
@@ -146,6 +173,11 @@ export default function ProfileViewerView() {
                       <p className="text-sm text-gray-700 font-medium mb-1">
                         📚 {userData.course}
                         {userData.specialization && <span className="text-gray-500"> • {userData.specialization}</span>}
+                      </p>
+                    )}
+                    {userData.gpa && (
+                      <p className="text-sm text-purple-700 font-semibold mb-1">
+                        📊 GPA: {userData.gpa}
                       </p>
                     )}
                     {userData.university && (
@@ -162,6 +194,14 @@ export default function ProfileViewerView() {
                       </p>
                     </div>
                   )}
+
+                  {/* Mobile Message Button */}
+                  <button
+                    onClick={handleMessage}
+                    className="w-full sm:hidden mb-4 flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-[#7D4DF4] to-[#A589FD] text-white font-semibold text-sm shadow-lg hover:opacity-90 transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Send Message
+                  </button>
                 </div>
 
                 {/* Right: Skills */}
@@ -221,6 +261,7 @@ export default function ProfileViewerView() {
             )}
           </div>
         </main>
+        {chatOpen && <ChatDialog onClose={() => setChatOpen(false)} />}
       </div>
   )
 }
