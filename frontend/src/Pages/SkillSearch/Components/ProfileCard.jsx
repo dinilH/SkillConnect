@@ -45,7 +45,7 @@ export default function ProfileCard({ user }) {
         </h2>
 
         <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-          ⭐ {user.averageRating || "N/A"}
+          {user.averageRating || "N/A"}
           <span>•</span>
           <div className="flex items-center gap-1">⏱ {user.responseTime || "Unknown"}</div>
           {user.isOnline && (

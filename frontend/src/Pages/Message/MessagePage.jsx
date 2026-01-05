@@ -36,7 +36,6 @@ const MessagePageContent = () => {
         <NavBar />
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="text-center">
-            <div className="text-4xl mb-4">⏳</div>
             <p className="text-gray-600">Loading chat...</p>
           </div>
         </div>

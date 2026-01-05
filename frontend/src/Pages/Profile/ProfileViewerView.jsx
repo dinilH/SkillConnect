@@ -167,13 +167,13 @@ export default function ProfileViewerView() {
                     )}
                     {userData.course && (
                       <p className="text-sm text-gray-700 font-medium mb-1">
-                        📚 {userData.course}
+                        {userData.course}
                         {userData.specialization && <span className="text-gray-500"> • {userData.specialization}</span>}
                       </p>
                     )}
                     {userData.gpa && (
                       <p className="text-sm text-purple-700 font-semibold mb-1">
-                        📊 GPA: {userData.gpa}
+                        GPA: {userData.gpa}
                       </p>
                     )}
                     {userData.university && (
