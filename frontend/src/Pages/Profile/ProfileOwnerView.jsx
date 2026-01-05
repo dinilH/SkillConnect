@@ -228,13 +228,13 @@ export default function ProfileOwnerView() {
                   <p className="text-base text-gray-900 font-medium mb-1">{profileData.position}</p>
                   {profileData.course && (
                     <p className="text-sm text-gray-700 font-medium mb-1">
-                      📚 {profileData.course}
+                      {profileData.course}
                       {profileData.specialization && <span className="text-gray-500"> • {profileData.specialization}</span>}
                     </p>
                   )}
                   {profileData.gpa && (
                     <p className="text-lg text-purple-700 font-bold mb-3 mt-2">
-                      📊 GPA: {profileData.gpa}
+                      GPA: {profileData.gpa}
                     </p>
                   )}
                   <p className="text-sm text-gray-500 font-medium">{profileData.university}</p>

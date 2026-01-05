@@ -197,7 +197,7 @@ export default function RequestCard({ data, isOwner, isAssigned = false, onUpdat
           <div className="flex items-center gap-1">⏱ {data.estimatedTime}</div>
         )}
         <div className="flex items-center gap-1">
-          📊 Status: <span className="font-semibold capitalize">{data.status}</span>
+          Status: <span className="font-semibold capitalize">{data.status}</span>
         </div>
       </div>
 

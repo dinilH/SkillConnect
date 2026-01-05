@@ -75,7 +75,6 @@ export default function Dashboard() {
         return (
             <div className="min-h-screen bg-linear-to-br from-[#F3E8FF] to-white w-full flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">⏳</div>
                     <p className="text-gray-600 text-lg">Loading...</p>
                 </div>
             </div>
@@ -120,7 +119,7 @@ export default function Dashboard() {
                                     <h2 className="text-2xl font-bold text-gray-800 mb-1">Your GPA</h2>
                                     <p className="text-sm text-gray-500">Track your academic progress</p>
                                 </div>
-                                <div className="text-4xl">📊</div>
+
                             </div>
                             
                             {currentGpa ? (
@@ -135,14 +134,14 @@ export default function Dashboard() {
                                             <p className={`text-sm font-medium ${shouldRecalculate ? 'text-orange-700' : 'text-green-700'}`}>
                                                 {shouldRecalculate ? (
                                                     <>
-                                                        ⚠️ Last calculated {daysSince} days ago. 
+                                                        Last calculated {daysSince} days ago. 
                                                         <span className="font-bold"> Time to update!</span> 
                                                         <br />
                                                         <span className="text-xs">We recommend calculating your GPA every 6 months (180 days)</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        ✅ Updated {daysSince} days ago. You're all set!
+                                                        Updated {daysSince} days ago. You're all set!
                                                     </>
                                                 )}
                                             </p>
@@ -158,7 +157,6 @@ export default function Dashboard() {
                                 </div>
                             ) : (
                                 <div className="text-center py-8">
-                                    <div className="text-6xl mb-4">🎯</div>
                                     <p className="text-gray-600 mb-4">You haven't calculated your GPA yet</p>
                                     <button 
                                         onClick={() => setShowGPAModal(true)}
@@ -174,7 +172,6 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-white rounded-2xl shadow-lg p-6 border border-purple-100 hover:shadow-xl transition-shadow">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="text-3xl">⭐</div>
                                     <h2 className="text-xl font-bold text-gray-800">Popular Members</h2>
                                 </div>
                                 <PopularMembers />
@@ -182,7 +179,6 @@ export default function Dashboard() {
                             
                             <div className="bg-white rounded-2xl shadow-lg p-6 border border-purple-100 hover:shadow-xl transition-shadow">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="text-3xl">🎯</div>
                                     <h2 className="text-xl font-bold text-gray-800">Skill Requests</h2>
                                 </div>
                                 <SkillRequests />
@@ -192,7 +188,6 @@ export default function Dashboard() {
                         {/* GPA Leaderboard */}
                         <div className="bg-white rounded-2xl shadow-lg p-6 border border-purple-100 hover:shadow-xl transition-shadow">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="text-3xl">🏆</div>
                                 <h2 className="text-xl font-bold text-gray-800">GPA Leaderboard</h2>
                             </div>
                             <Leaderboard />
@@ -203,7 +198,6 @@ export default function Dashboard() {
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-2xl shadow-lg p-6 border border-purple-100 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="text-3xl">🔥</div>
                                 <h2 className="text-xl font-bold text-gray-800">Active Now</h2>
                             </div>
                             <ActiveMembers />
