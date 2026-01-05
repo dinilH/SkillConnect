@@ -184,11 +184,9 @@ export default function Leaderboard() {
 
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
-                  <img
-                    src={student.profileImage || "/user-profile-illustration.png"}
-                    alt={student.name}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-                  />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#7D4DF4] to-[#A589FD] flex items-center justify-center text-white text-base font-bold shadow-md">
+                    {student.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                  </div>
                 </div>
 
                 {/* Student Info */}

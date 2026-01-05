@@ -37,6 +37,21 @@ export default function Filters({ onFilterChange }) {
     onFilterChange({ verifiedOnly: newVerified });
   };
 
+  const handleClearFilters = () => {
+    setCategory("");
+    setSkillLevel("");
+    setAvailability("");
+    setMinRating("");
+    setVerifiedOnly(false);
+    onFilterChange({ 
+      category: "", 
+      skillLevel: "", 
+      availability: "", 
+      minRating: "", 
+      verifiedOnly: false 
+    });
+  };
+
   return (
     <div className="
     p-6
@@ -45,10 +60,18 @@ export default function Filters({ onFilterChange }) {
       h-fit
       text-left
     ">
-      {/* Title */}
-      <h2 className="text-base font-bold text-gray-700 mb-2">
-        Filters
-      </h2>
+      {/* Title and Clear Button */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-base font-bold text-gray-700">
+          Filters
+        </h2>
+        <button
+          onClick={handleClearFilters}
+          className="text-xs text-purple-600 hover:text-purple-800 font-semibold transition"
+        >
+          Clear All
+        </button>
+      </div>
 
       {/* Category */}
       <div className="mb-6">
@@ -71,16 +94,15 @@ export default function Filters({ onFilterChange }) {
           {["Beginner", "Intermediate", "Advanced", "Expert"].map((level) => (
             <label
               key={level}
-              className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer"
-              onClick={() => handleSkillLevelChange(level)}
+              className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer hover:text-purple-600 transition"
             >
               <input
                 type="radio"
                 checked={skillLevel === level}
                 onChange={() => handleSkillLevelChange(level)}
-                className="cursor-pointer"
+                className="cursor-pointer accent-purple-600 w-4 h-4"
               />
-              {level}
+              <span>{level}</span>
             </label>
           ))}
         </div>
@@ -95,16 +117,15 @@ export default function Filters({ onFilterChange }) {
           {["Available Now", "Busy"].map((item) => (
             <label
               key={item}
-              className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer"
-              onClick={() => handleAvailabilityChange(item)}
+              className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer hover:text-purple-600 transition"
             >
               <input
                 type="radio"
                 checked={availability === item}
                 onChange={() => handleAvailabilityChange(item)}
-                className="cursor-pointer"
+                className="cursor-pointer accent-purple-600 w-4 h-4"
               />
-              {item}
+              <span>{item}</span>
             </label>
           ))}
         </div>
@@ -115,28 +136,29 @@ export default function Filters({ onFilterChange }) {
       {/* Maximum Rating */}
       <div className="mb-6">
         <p className="text-base font-bold text-gray-700 mb-2">Minimum Rating</p>
-        <div className="flex flex-col gap-2 text-yellow-400 text-xl">
+        <div className="flex flex-col gap-2">
           {[
             { stars: 5, label: " & up", value: "5" },
             { stars: 4, label: " & up", value: "4" },
             { stars: 3, label: " & up", value: "3" },
           ].map((item, idx) => (
-            <div
+            <label
               key={idx}
-              className="flex items-center gap-1 cursor-pointer"
-              onClick={() => handleRatingChange(item.value)}
+              className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition"
             >
               <input
                 type="radio"
                 checked={minRating === item.value}
                 onChange={() => handleRatingChange(item.value)}
-                className="cursor-pointer"
+                className="cursor-pointer accent-purple-600 w-4 h-4"
               />
-              {Array.from({ length: item.stars }).map((_, i) => (
-                <span key={i}>★</span>
-              ))}
-              <span className="text-xs text-black ml-1">{item.label}</span>
-            </div>
+              <div className="flex items-center text-yellow-400 text-lg ml-1">
+                {Array.from({ length: item.stars }).map((_, i) => (
+                  <span key={i}>★</span>
+                ))}
+                <span className="text-xs text-gray-700 ml-1">{item.label}</span>
+              </div>
+            </label>
           ))}
         </div>
         <hr className="border-gray-300 mt-4" />
@@ -147,14 +169,14 @@ export default function Filters({ onFilterChange }) {
       <div className="mb-2">
         <p className="text-base font-bold text-gray-700 mb-2">Other</p>
 
-        <label className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer">
+        <label className="flex items-center gap-2 text-gray-700 text-sm cursor-pointer hover:text-purple-600 transition">
           <input
             type="checkbox"
             checked={verifiedOnly}
             onChange={handleVerifiedChange}
-            className="cursor-pointer"
+            className="cursor-pointer accent-purple-600 w-4 h-4"
           />
-          Verified Only
+          <span>Verified Only</span>
         </label>
       </div>
     </div>

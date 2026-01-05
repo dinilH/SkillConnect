@@ -1,11 +1,18 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button2 from '../../../components/ui/button';
+import RequestHelpModal from "./RequestHelpModal";
 
 export default function ProfileCard({ user }) {
   const navigate = useNavigate();
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   const handleViewProfile = () => {
     navigate(`/profile/${user._id}`);
+  };
+
+  const handleRequestHelp = () => {
+    setShowRequestModal(true);
   };
 
   // Extract skill titles from skills array
@@ -17,6 +24,7 @@ export default function ProfileCard({ user }) {
     : null;
 
   return (
+    <>
     <div className="
       bg-white rounded-3xl shadow-lg p-6 flex gap-6
       border border-purple-200 hover:shadow-purple-300/40 transition
@@ -82,6 +90,7 @@ export default function ProfileCard({ user }) {
         </Button2>
 
         <button
+          onClick={handleRequestHelp}
           className="px-4 py-2 rounded-xl border border-purple-300 transition hover:brightness-90"
           style={{ backgroundColor: '#b4a4e7ff', color: 'white' }}
         >
@@ -90,5 +99,17 @@ export default function ProfileCard({ user }) {
       </div>
 
     </div>
+    
+    {showRequestModal && (
+      <RequestHelpModal
+        targetUser={user}
+        onClose={() => setShowRequestModal(false)}
+        onRequestCreated={() => {
+          // Optionally handle post-creation actions
+          console.log("Help request created");
+        }}
+      />
+    )}
+    </>
   );
 }
