@@ -1,3 +1,5 @@
+<img width="1222" height="780" alt="Skill Search" src="https://github.com/user-attachments/assets/46cddd99-808b-4dfc-91f4-c34a6abe71c2" />
+<img width="1132" height="985" alt="Skill Request" src="https://github.com/user-attachments/assets/b9941df9-bad2-4ca0-b3da-b7c1b4be9a92" />
 <img width="882" height="1032" alt="dashboard" src="https://github.com/user-attachments/assets/f19089e6-dc0c-40da-96f6-0ac9b84237b8" />
 # SkillConnect
 
